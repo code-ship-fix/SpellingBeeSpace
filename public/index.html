@@ -169,6 +169,30 @@
             justify-content: center;
         }
 
+        .disclaimer {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 10px;
+            margin: 20px 0;
+            padding: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            border-left: 4px solid #3182ce;
+        }
+
+        .disclaimer-content {
+            text-align: center;
+        }
+
+        .disclaimer-content p {
+            color: #2d3748;
+            font-size: 0.9em;
+            line-height: 1.5;
+            margin: 0;
+        }
+
+        .disclaimer-content strong {
+            color: #3182ce;
+        }
+
         .export-warning {
             color: #e53e3e;
             font-size: 0.9em;
@@ -565,6 +589,13 @@
                 <div class="data-info" id="dataInfo">
                     <span class="data-status">💾 All data saved locally</span>
                 </div>
+            </div>
+        </div>
+
+        <!-- User Tracking Disclaimer -->
+        <div class="disclaimer">
+            <div class="disclaimer-content">
+                <p><strong>📊 Data Collection Notice:</strong> This site collects anonymous usage statistics including IP address, geographic location, and interaction patterns to improve the learning experience. No personal information is stored. By using this site, you consent to this data collection.</p>
             </div>
         </div>
         <div class="export-warning">
@@ -1048,6 +1079,8 @@
 
         // OpenAI TTS Integration
         async function generateAIAudio(text, voice = 'nova', rate = 0.9) {
+            // Track AI speech usage
+            trackUserAction('ai_speech');
 
             // Enhanced text cleaning to prevent truncation
             let cleanText = text.trim();
@@ -1080,7 +1113,8 @@
                     body: JSON.stringify({
                         text: cleanText,
                         voice: voice,
-                        speed: Math.max(0.25, Math.min(4.0, rate))
+                        speed: Math.max(0.25, Math.min(4.0, rate)),
+                        sessionId: userSessionId
                     })
                 });
 
@@ -1250,6 +1284,9 @@
 
         function setWordStatus(wordNumber, status) {
             try {
+                // Track word practice
+                trackUserAction('practiced');
+
                 const data = localStorage.getItem('spellingBeeProgress');
                 const progress = data ? JSON.parse(data) : {};
                 progress[wordNumber] = {
@@ -1423,6 +1460,9 @@
         }
 
         async function speakWord(word, rate = 0.75) {
+            // Track classic speech usage
+            trackUserAction('classic_speech');
+
             // Always use browser voice for regular speak buttons
             const selectedVoice = 'browser';
 
@@ -1649,8 +1689,53 @@
             updateStats();
         }
 
+        // User tracking variables
+        let userSessionId = localStorage.getItem('userSessionId') || null;
+
+        // User tracking functions
+        async function initializeSession() {
+            try {
+                const response = await fetch('/api/track/session', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ sessionId: userSessionId })
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    userSessionId = data.sessionId;
+                    localStorage.setItem('userSessionId', userSessionId);
+                }
+            } catch (error) {
+                console.log('Session tracking unavailable:', error);
+            }
+        }
+
+        async function trackUserAction(action) {
+            if (!userSessionId) return;
+
+            try {
+                await fetch('/api/track/word', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        sessionId: userSessionId,
+                        action: action
+                    })
+                });
+            } catch (error) {
+                console.log('Action tracking unavailable:', error);
+            }
+        }
+
         // Event listeners
         document.addEventListener('DOMContentLoaded', function() {
+            // Initialize user session
+            initializeSession();
             // Filter buttons
             document.querySelectorAll('.filter-btn').forEach(btn => {
                 btn.addEventListener('click', function() {

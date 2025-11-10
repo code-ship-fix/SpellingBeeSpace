@@ -58,3 +58,7 @@ Thumbs.db
 # Temporary files
 *.tmp
 *.temp
+
+# User tracking database
+user_tracking.db
+user_tracking.db-journal

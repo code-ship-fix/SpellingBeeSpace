@@ -37,6 +37,7 @@ Open http://localhost:3000 in your browser.
 - ✅ **Input Validation**: Text length and content validation
 - ✅ **Error Handling**: Graceful error responses
 - ✅ **CORS Protection**: Configurable cross-origin policies
+- ✅ **User Tracking**: Anonymous analytics with IP geolocation
 
 ## 📱 Features
 
@@ -48,6 +49,7 @@ Open http://localhost:3000 in your browser.
 - **Search & Filter**: Find words by name, type, or definition
 - **Mobile Responsive**: Works on all devices
 - **Accessibility**: WCAG compliant design
+- **User Analytics**: Anonymous tracking with geographical insights
 
 ## 🛠 Tech Stack
 
@@ -93,7 +95,8 @@ Generate speech audio from text
 {
   "text": "hello world",
   "voice": "nova",
-  "speed": 0.9
+  "speed": 0.9,
+  "sessionId": "optional_session_id"
 }
 ```
 
@@ -107,6 +110,26 @@ Health check endpoint
 }
 ```
 
+### `POST /api/track/session`
+Initialize user tracking session
+```json
+{
+  "sessionId": "optional_existing_session"
+}
+```
+
+### `POST /api/track/word`
+Track user interactions
+```json
+{
+  "sessionId": "user_session_id",
+  "action": "practiced|ai_speech|classic_speech"
+}
+```
+
+### `GET /api/admin/export?password=admin_password`
+Export user analytics data as Excel file (admin only)
+
 ## 🔧 Environment Variables
 
 | Variable | Required | Description |
@@ -114,6 +137,7 @@ Health check endpoint
 | `OPENAI_API_KEY` | Yes | OpenAI API key for TTS |
 | `PORT` | No | Server port (default: 3000) |
 | `NODE_ENV` | No | Environment (development/production) |
+| `ADMIN_PASSWORD` | No | Password for analytics export (default: spellingbee2024) |
 
 ## 📈 Usage Costs
 
@@ -121,13 +145,34 @@ Health check endpoint
 - **Average word**: ~8 characters = $0.00012 per word
 - **All 450 words**: ~$0.054 total
 
-## 🛡 Security Best Practices
+## 🛡 Security & Privacy
 
 1. **Never commit .env files** to version control
 2. **Use HTTPS** in production
 3. **Monitor API usage** and set billing alerts
 4. **Implement authentication** for sensitive deployments
 5. **Regular security updates** for dependencies
+6. **User Analytics**: Anonymous data collection with IP geolocation
+7. **Data Export**: Secure admin access to download user statistics
+8. **Privacy Compliance**: Transparent data collection disclaimer
+
+## 📊 Analytics & Data Export
+
+### Export User Data
+Access admin dashboard to download user analytics:
+```
+GET /api/admin/export?password=your_admin_password
+```
+
+### Data Includes:
+- Anonymous session tracking
+- IP-based geographic location (country, region, city)
+- Usage patterns (words practiced, speech usage)
+- Visit frequency and duration
+- User agent information
+
+### Privacy Notice:
+The application displays a clear disclaimer about data collection and complies with privacy best practices by collecting only anonymous usage statistics.
 
 ## 📝 License
 
