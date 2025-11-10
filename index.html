@@ -1,0 +1,1853 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spelling Bee Space - 450 Words</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .header {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .header h1 {
+            color: #5a67d8;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 15px;
+        }
+
+        .stat {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2em;
+            font-weight: bold;
+            color: #5a67d8;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .controls {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .control-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .control-row:last-child {
+            margin-bottom: 0;
+        }
+
+        .filter-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .range-filters {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .range-btn {
+            padding: 6px 12px;
+            border: 2px solid #48bb78;
+            border-radius: 6px;
+            background: white;
+            color: #48bb78;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            font-size: 0.9em;
+        }
+
+        .range-btn.active {
+            background: #48bb78;
+            color: white;
+        }
+
+        .range-btn:hover {
+            transform: translateY(-1px);
+        }
+
+        .voice-controls {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .voice-controls label {
+            font-weight: 600;
+            color: #2d3748;
+        }
+
+
+        .api-key-btn {
+            padding: 8px 12px;
+            background: #ed8936;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: all 0.3s ease;
+        }
+
+        .api-key-btn:hover {
+            background: #dd6b20;
+            transform: translateY(-1px);
+        }
+
+        .voice-status {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .status-text {
+            font-size: 0.85em;
+            color: #666;
+            font-style: italic;
+        }
+
+        .status-ai {
+            color: #48bb78;
+            font-weight: 600;
+        }
+
+        .status-error {
+            color: #f56565;
+        }
+
+        .data-controls {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .disclaimer {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 10px;
+            margin: 20px 0;
+            padding: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            border-left: 4px solid #3182ce;
+        }
+
+        .disclaimer-content {
+            text-align: center;
+        }
+
+        .disclaimer-content p {
+            color: #2d3748;
+            font-size: 0.9em;
+            line-height: 1.5;
+            margin: 0;
+        }
+
+        .disclaimer-content strong {
+            color: #3182ce;
+        }
+
+        .export-warning {
+            color: #e53e3e;
+            font-size: 0.9em;
+            text-align: center;
+            margin-top: 8px;
+            font-weight: 500;
+            line-height: 1.4;
+        }
+
+        .data-btn {
+            padding: 8px 12px;
+            background: #4a5568;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: all 0.3s ease;
+        }
+
+        .data-btn:hover {
+            background: #2d3748;
+            transform: translateY(-1px);
+        }
+
+        .data-btn.danger {
+            background: #e53e3e;
+        }
+
+        .data-btn.danger:hover {
+            background: #c53030;
+        }
+
+        .data-info {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .data-status {
+            font-size: 0.85em;
+            color: #48bb78;
+            font-weight: 600;
+        }
+
+        .filter-btn {
+            padding: 8px 16px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .filter-btn.active {
+            background: #5a67d8;
+            color: white;
+            border-color: #5a67d8;
+        }
+
+        .search-box {
+            padding: 10px 15px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 1em;
+            min-width: 200px;
+        }
+
+        .matrix-container {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .section {
+            margin-bottom: 20px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .section-header {
+            background: #f7fafc;
+            padding: 15px 20px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s ease;
+            user-select: none;
+        }
+
+        .section-header:hover {
+            background: #edf2f7;
+        }
+
+        .section-title {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #2d3748;
+        }
+
+        .section-stats {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .section-stat {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 0.9em;
+        }
+
+        .stat-correct { color: #48bb78; }
+        .stat-incorrect { color: #f56565; }
+        .stat-untested { color: #a0aec0; }
+
+        .section-toggle {
+            font-size: 1.5em;
+            color: #5a67d8;
+            transition: transform 0.3s ease;
+        }
+
+        .section.collapsed .section-toggle {
+            transform: rotate(-90deg);
+        }
+
+        .section-content {
+            padding: 20px;
+            display: block;
+        }
+
+        .section.collapsed .section-content {
+            display: none;
+        }
+
+        .word-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 15px;
+        }
+
+        .word-item {
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 15px;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .word-item.correct {
+            border-color: #48bb78;
+            background: #f0fff4;
+        }
+
+        .word-item.incorrect {
+            border-color: #f56565;
+            background: #fff5f5;
+        }
+
+        .word-item.untested {
+            border-color: #e2e8f0;
+            background: white;
+        }
+
+        .word-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .word-number {
+            background: #5a67d8;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 5px;
+            font-size: 0.8em;
+            font-weight: bold;
+        }
+
+        .word-text {
+            font-size: 1.4em;
+            font-weight: bold;
+            color: #2d3748;
+            margin-bottom: 5px;
+        }
+
+        .word-type {
+            color: #666;
+            font-style: italic;
+            margin-bottom: 8px;
+        }
+
+        .word-definition {
+            color: #4a5568;
+            font-size: 0.9em;
+            line-height: 1.4;
+            margin-bottom: 15px;
+        }
+
+        .word-controls {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .speak-btn, .slow-btn, .ai-btn {
+            padding: 8px 12px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .speak-btn {
+            background: #5a67d8;
+            color: white;
+        }
+
+        .slow-btn {
+            background: #48bb78;
+            color: white;
+        }
+
+        .ai-btn {
+            background: #9f7aea;
+            color: white;
+        }
+
+        .speak-btn:hover, .slow-btn:hover, .ai-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .speak-btn:disabled, .slow-btn:disabled, .ai-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .status-buttons {
+            display: flex;
+            gap: 8px;
+        }
+
+        .status-btn {
+            padding: 6px 10px;
+            border: 2px solid;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.8em;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .correct-btn {
+            border-color: #48bb78;
+            color: #48bb78;
+            background: white;
+        }
+
+        .correct-btn.active {
+            background: #48bb78;
+            color: white;
+        }
+
+        .incorrect-btn {
+            border-color: #f56565;
+            color: #f56565;
+            background: white;
+        }
+
+        .incorrect-btn.active {
+            background: #f56565;
+            color: white;
+        }
+
+        .clear-btn {
+            border-color: #a0aec0;
+            color: #a0aec0;
+            background: white;
+        }
+
+        .clear-btn:hover {
+            background: #a0aec0;
+            color: white;
+        }
+
+        .last-attempt {
+            font-size: 0.75em;
+            color: #666;
+            margin-top: 8px;
+            font-style: italic;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+
+        @media (max-width: 768px) {
+            .word-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .filter-buttons {
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>📝 Spelling Bee Space - 450 Words</h1>
+        <div class="stats">
+            <div class="stat">
+                <div class="stat-number" id="correctCount">0</div>
+                <div class="stat-label">Correct</div>
+            </div>
+            <div class="stat">
+                <div class="stat-number" id="incorrectCount">0</div>
+                <div class="stat-label">Incorrect</div>
+            </div>
+            <div class="stat">
+                <div class="stat-number" id="untestedCount">450</div>
+                <div class="stat-label">Untested</div>
+            </div>
+            <div class="stat">
+                <div class="stat-number" id="progressPercent">0%</div>
+                <div class="stat-label">Progress</div>
+            </div>
+        </div>
+        <div class="ai-info" id="aiInfo" style="margin-top: 15px; padding: 10px; background: #f0f9ff; border-radius: 8px; font-size: 0.9em; color: #1e40af; display: none;">
+            <strong>🤖 Natural AI Voices Available!</strong><br>
+            Get ultra-natural speech with OpenAI's voices. <a href="https://platform.openai.com/api-keys" target="_blank" style="color: #1d4ed8;">Get API key here</a> (~$0.015 per 1K characters)
+        </div>
+    </div>
+
+    <div class="controls">
+        <div class="control-row">
+            <div class="filter-buttons">
+                <button class="filter-btn active" data-filter="all">All Words</button>
+                <button class="filter-btn" data-filter="correct">Correct</button>
+                <button class="filter-btn" data-filter="incorrect">Incorrect</button>
+                <button class="filter-btn" data-filter="untested">Untested</button>
+            </div>
+            <input type="text" class="search-box" id="searchBox" placeholder="Search words...">
+        </div>
+
+        <div class="control-row">
+            <div class="range-filters">
+                <button class="range-btn active" data-range="all">All Ranges</button>
+                <button class="range-btn" data-range="1-50">1-50</button>
+                <button class="range-btn" data-range="51-100">51-100</button>
+                <button class="range-btn" data-range="101-150">101-150</button>
+                <button class="range-btn" data-range="151-200">151-200</button>
+                <button class="range-btn" data-range="201-250">201-250</button>
+                <button class="range-btn" data-range="251-300">251-300</button>
+                <button class="range-btn" data-range="301-350">301-350</button>
+                <button class="range-btn" data-range="351-400">351-400</button>
+                <button class="range-btn" data-range="401-450">401-450</button>
+            </div>
+        </div>
+
+        <div class="control-row">
+            <div class="voice-controls">
+                <div class="voice-status" id="voiceStatus">
+                    <span class="status-text status-ai">🤖 AI Ready: Nova</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="control-row">
+            <div class="data-controls">
+                <button id="exportBtn" class="data-btn">💾 Export Progress</button>
+                <button id="importBtn" class="data-btn">📁 Import Progress</button>
+                <input type="file" id="importFile" accept=".json" style="display: none;">
+                <div class="data-info" id="dataInfo">
+                    <span class="data-status">💾 All data saved locally</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- User Tracking Disclaimer -->
+        <div class="disclaimer">
+            <div class="disclaimer-content">
+                <p><strong>📊 Data Collection Notice:</strong> This site collects anonymous usage statistics including IP address, geographic location, and interaction patterns to improve the learning experience. No personal information is stored. By using this site, you consent to this data collection.</p>
+            </div>
+        </div>
+        <div class="export-warning">
+            Please export your progress before ending the session to seamlessly resume from the same point next time by importing the file
+        </div>
+    </div>
+
+    <div class="matrix-container" id="matrixContainer">
+        <div class="loading">Loading words...</div>
+    </div>
+
+    <script>
+        // All 450 words from the PDF
+        const words = [
+            { number: 1, word: "deep", type: "adjective", definition: "extending downward to a considerable degree." },
+            { number: 2, word: "happy", type: "adjective", definition: "having the feeling arising from the consciousness of well-being." },
+            { number: 3, word: "bump", type: "verb", definition: "to hit or knock typically with a degree of force or violence and making a thudding impact and usually with a degree of injury or damage." },
+            { number: 4, word: "bear", type: "noun", definition: "an animal having long shaggy hair, feeding on fruit and insects as well as on flesh, and moving very fast for short distances." },
+            { number: 5, word: "count", type: "verb", definition: "to separate one by one to find the total number of units : to number or tally." },
+            { number: 6, word: "dunk", type: "verb", definition: "to dip (as a piece of bread, cake, or doughnut) into liquid (as coffee, milk, or tea) while eating." },
+            { number: 7, word: "feet", type: "plural noun", definition: "the terminal parts of the vertebrate legs upon which an individual stands." },
+            { number: 8, word: "cold", type: "adjective", definition: "having a temperature notably below that compatible with human comfort." },
+            { number: 9, word: "alone", type: "adjective", definition: "away from other people or things." },
+            { number: 10, word: "click", type: "verb", definition: "to select (something on a computer) by placing the cursor over it and pressing a button on your mouse." },
+            { number: 11, word: "miss", type: "verb", definition: "to feel the lack of : to be unhappy because of the loss or absence of." },
+            { number: 12, word: "shirt", type: "noun", definition: "a loose cloth garment usually having a collar, sleeves, a front opening, and a tail long enough to be tucked inside the waistband of trousers or a skirt." },
+            { number: 13, word: "roof", type: "noun", definition: "the outside cover on top of a building or home." },
+            { number: 14, word: "here", type: "adverb", definition: "at this point in space : in this location." },
+            { number: 15, word: "lamp", type: "noun", definition: "a light-giving device." },
+            { number: 16, word: "lost", type: "adjective", definition: "gone out of one's possession or control : put in an unremembered place." },
+            { number: 17, word: "lunch", type: "noun", definition: "the meal that is eaten in the middle of the day." },
+            { number: 18, word: "drift", type: "verb", definition: "to become driven or carried along by a current of water, wind, or air." },
+            { number: 19, word: "please", type: "adverb", definition: "—used as a function word to express politeness or emphasis in a request." },
+            { number: 20, word: "spill", type: "verb", definition: "to cause or allow to pour, splash, or fall out (as over the edge of a container) and be wasted, lost, or scattered." },
+            { number: 21, word: "tired", type: "adjective", definition: "drained of strength and energy : fatigued often to the point of exhaustion : weary." },
+            { number: 22, word: "large", type: "adjective", definition: "big." },
+            { number: 23, word: "lake", type: "noun", definition: "a large body of water surrounded by land." },
+            { number: 24, word: "grab", type: "verb", definition: "to take or take hold of by a sudden motion or grasp : to seize, to clutch." },
+            { number: 25, word: "juice", type: "noun", definition: "the extractable fluid contents of plant cells or plant structures." },
+            { number: 26, word: "nook", type: "noun", definition: "a secluded or out-of-the-way place or part." },
+            { number: 27, word: "shops", type: "verb", definition: "examines goods and services with intent to buy." },
+            { number: 28, word: "spot", type: "noun", definition: "a small extent of space." },
+            { number: 29, word: "world", type: "noun", definition: "the earth with all its inhabitants and all things upon it." },
+            { number: 30, word: "math", type: "noun", definition: "a science that deals with the relationship and symbolism of numbers." },
+            { number: 31, word: "pick", type: "verb", definition: "to select from among a group." },
+            { number: 32, word: "soap", type: "noun", definition: "a cleansing agent that is used for washing something." },
+            { number: 33, word: "tools", type: "plural noun", definition: "instruments (such as hammers or saws) used or worked by hand." },
+            { number: 34, word: "green", type: "adjective", definition: "being the color of grass or emeralds." },
+            { number: 35, word: "muddy", type: "adjective", definition: "covered with a slimy sticky mixture of finely divided particles of solid material and water." },
+            { number: 36, word: "ripe", type: "adjective", definition: "fully developed and so usable as food — used of fruit." },
+            { number: 37, word: "sign", type: "noun", definition: "a board on a building that tells the name and type of a business." },
+            { number: 38, word: "soup", type: "noun", definition: "a liquid food made with broth that often contains pieces of meat, fish, pasta, or vegetables." },
+            { number: 39, word: "warm", type: "adjective", definition: "sending or giving out heat usually to a comfortable or beneficial degree : producing sensations of heat." },
+            { number: 40, word: "fresh", type: "adjective", definition: "newly produced, gathered, or made." },
+            { number: 41, word: "learn", type: "verb", definition: "to gain knowledge or understanding of or skill in by study, instruction, or experience." },
+            { number: 42, word: "frosty", type: "adjective", definition: "cold, freezing." },
+            { number: 43, word: "crisp", type: "adjective", definition: "easily broken, cracked, or snapped." },
+            { number: 44, word: "shape", type: "noun", definition: "the visible makeup characteristic of a particular item or kind of item : characteristic appearance or visible form." },
+            { number: 45, word: "splash", type: "verb", definition: "to strike and dash about (as water or mud) : to cause (a liquid or thinly viscous substance) to spatter or toss about especially with force." },
+            { number: 46, word: "mushy", type: "adjective", definition: "soft, spongy." },
+            { number: 47, word: "group", type: "noun", definition: "a relatively small number of individuals assembled or standing together." },
+            { number: 48, word: "spine", type: "noun", definition: "the backbone of a book." },
+            { number: 49, word: "straps", type: "verb", definition: "secures with or attaches by means of a narrow usually flat strip or thong of a flexible material." },
+            { number: 50, word: "feast", type: "noun", definition: "an elaborate meal : a banquet." },
+            { number: 51, word: "eagle", type: "noun", definition: "any of various large diurnal birds of prey noted for their strength, size, graceful figure, keenness of vision, and powers of flight." },
+            { number: 52, word: "berries", type: "plural noun", definition: "pulpy and usually edible fruits of small size." },
+            { number: 53, word: "caves", type: "plural noun", definition: "hollowed-out chambers in the earth or in the sides of cliffs or hills." },
+            { number: 54, word: "blanket", type: "noun", definition: "a piece of warm fabric used as a bed covering." },
+            { number: 55, word: "catch", type: "verb", definition: "to take hold of especially suddenly or forcibly : to grasp." },
+            { number: 56, word: "updo", type: "noun", definition: "an upswept hairdo." },
+            { number: 57, word: "mule", type: "noun", definition: "a hybrid between the horse and the donkey." },
+            { number: 58, word: "glow", type: "verb", definition: "to shine with light or become lit up." },
+            { number: 59, word: "quick", type: "adjective", definition: "done or taking place with rapidity : done or taking place within only a small interval of time." },
+            { number: 60, word: "cotton", type: "noun", definition: "a soft fibrous usually white substance that clothes the seeds of various plants and is used extensively in the making of threads, yarns, and fabrics." },
+            { number: 61, word: "seats", type: "plural noun", definition: "assigned or regularly assumed sitting places." },
+            { number: 62, word: "baseball", type: "noun", definition: "a game played by two teams of nine in which players try to score runs by hitting a small ball with a bat and running to each of four bases located on a large field." },
+            { number: 63, word: "great", type: "adjective", definition: "wonderful, admirable." },
+            { number: 64, word: "playground", type: "noun", definition: "a piece of land used for and usually having special facilities for recreation especially by children." },
+            { number: 65, word: "monster", type: "noun", definition: "a ferocious legendary animal usually of great size." },
+            { number: 66, word: "enjoy", type: "verb", definition: "to make happy." },
+            { number: 67, word: "jazzy", type: "adjective", definition: "of an unrestrained, animated, or flashy character." },
+            { number: 68, word: "jeans", type: "plural noun", definition: "pants usually made of a durable twilled cotton cloth or denim and worn for work or sports." },
+            { number: 69, word: "partner", type: "noun", definition: "one that is associated in any action with another : associate, colleague." },
+            { number: 70, word: "raindrop", type: "noun", definition: "a liquid globule of water falling especially from the clouds." },
+            { number: 71, word: "office", type: "noun", definition: "a place where a particular kind of business is transacted or a service is supplied." },
+            { number: 72, word: "young", type: "adjective", definition: "in an early stage of life, growth, or development." },
+            { number: 73, word: "outside", type: "adverb", definition: "in the open air." },
+            { number: 74, word: "poem", type: "noun", definition: "writing in verse." },
+            { number: 75, word: "pillow", type: "noun", definition: "a sack made typically of cloth and filled with a soft material used to support the head of a person resting or sleeping." },
+            { number: 76, word: "steady", type: "adjective", definition: "firm in standing or position : not tottering or shaking : fixed." },
+            { number: 77, word: "Saturday", type: "noun", definition: "the seventh day of the week : the day following Friday." },
+            { number: 78, word: "needle", type: "noun", definition: "a small slender rodlike instrument for hand sewing that has a round or elongated eye for thread at one end and a blunt or sharp point at the other and that is made usually of steel or bone in straight or curved form." },
+            { number: 79, word: "above", type: "adverb", definition: "in a higher place : overhead." },
+            { number: 80, word: "honking", type: "verb", definition: "causing (as a horn) to make a noise resembling the cry of a goose." },
+            { number: 81, word: "strange", type: "adjective", definition: "unusual." },
+            { number: 82, word: "noisy", type: "adjective", definition: "full of or characterized by the presence of sound." },
+            { number: 83, word: "video", type: "noun", definition: "a recording of visual images and sound stored in digital form." },
+            { number: 84, word: "timer", type: "noun", definition: "a stopwatch for timing races or contests." },
+            { number: 85, word: "topics", type: "plural noun", definition: "subjects under discussion or consideration." },
+            { number: 86, word: "layer", type: "noun", definition: "one thickness, course, or fold laid or lying over or under another." },
+            { number: 87, word: "token", type: "noun", definition: "a piece or disk (as of metal) certified as having a definite value for payment or exchange." },
+            { number: 88, word: "control", type: "verb", definition: "to have power over : to rule." },
+            { number: 89, word: "summer", type: "noun", definition: "the season that consists of June, July, and August." },
+            { number: 90, word: "across", type: "preposition", definition: "from one side to the opposite side of." },
+            { number: 91, word: "stiff", type: "adjective", definition: "incapable of or resistant to being flexed or bent : rigid." },
+            { number: 92, word: "running", type: "verb", definition: "going steadily by springing steps so that both feet leave the ground for an instant in each step." },
+            { number: 93, word: "field", type: "noun", definition: "a land area free of woodland, cities, and towns : open country." },
+            { number: 94, word: "behind", type: "preposition", definition: "toward the back : backward." },
+            { number: 95, word: "trace", type: "verb", definition: "to copy (as a drawing, engraving, or manuscript) by following the lines or letters as seen through a transparent sheet superimposed on the original." },
+            { number: 96, word: "below", type: "preposition", definition: "downward from." },
+            { number: 97, word: "loose", type: "adjective", definition: "not rigidly fastened or securely attached : lacking a firm or tight connection : ready to move or come apart from an attachment." },
+            { number: 98, word: "spare", type: "adjective", definition: "not being used : held for future or emergency use." },
+            { number: 99, word: "cling", type: "verb", definition: "to adhere closely and firmly as if glued." },
+            { number: 100, word: "grins", type: "verb", definition: "draws back the lips from the teeth in merriment or good humor." },
+            { number: 101, word: "giraffe", type: "noun", definition: "a large fleet African ruminant mammal that is the tallest of living quadrupeds and has a very long rather stiff neck and a short coat of fawn or cream-colored hair marked with large reddish or brown blotches." },
+            { number: 102, word: "groceries", type: "plural noun", definition: "articles of goods sold by a dealer in staple foodstuffs and usually meats and other foods." },
+            { number: 103, word: "huddling", type: "verb", definition: "gathering in a group : pressing close together." },
+            { number: 104, word: "jigsaw", type: "noun", definition: "a puzzle made by sawing or cutting a picture into small pieces to be fitted together." },
+            { number: 105, word: "neighbors", type: "plural noun", definition: "ones that live next to or near others." },
+            { number: 106, word: "gasped", type: "verb", definition: "caught the breath audibly often as an expression of shock, concern, or emotion." },
+            { number: 107, word: "mansion", type: "noun", definition: "a home that is impressive due to its size." },
+            { number: 108, word: "midday", type: "noun", definition: "noon." },
+            { number: 109, word: "powwow", type: "noun", definition: "a North American Indian ceremony (as for the cure of disease, success in hunting, victory in war) often accompanied by great noise, feasting, and dancing." },
+            { number: 110, word: "bazaar", type: "noun", definition: "a market place or market (as in the Middle East) that usually consists of rows of shops or stalls where all kinds of goods are offered for sale." },
+            { number: 111, word: "astray", type: "adverb", definition: "into a wrong or mistaken way of thinking or acting." },
+            { number: 112, word: "liquid", type: "noun", definition: "an extremely fluid substance that flows freely like water." },
+            { number: 113, word: "fuel", type: "noun", definition: "a material (as coal, gas, oil, or wood) used to produce heat or power by burning." },
+            { number: 114, word: "massive", type: "adjective", definition: "weighty : heavy." },
+            { number: 115, word: "women", type: "plural noun", definition: "female human beings." },
+            { number: 116, word: "chuckle", type: "verb", definition: "to laugh inwardly or quietly." },
+            { number: 117, word: "handstand", type: "noun", definition: "an act of supporting the body on the hands with the trunk and legs balanced in air." },
+            { number: 118, word: "machine", type: "noun", definition: "an assemblage of parts that are usually solid bodies that transmit forces, motion, and energy one to another in some predetermined manner and to some desired end (as for sewing a seam, hoisting a load, or maintaining an electric current)." },
+            { number: 119, word: "leaking", type: "verb", definition: "letting a substance (as water or gas) or light in or out through a hole, crevice, or other opening." },
+            { number: 120, word: "snazzy", type: "adjective", definition: "outstanding in style : conspicuously or flashily attractive." },
+            { number: 121, word: "whee", type: "interjection", definition: "—used to express delight or general exuberance." },
+            { number: 122, word: "welcome", type: "noun", definition: "a friendly greeting or reception given to a person when he or she arrives." },
+            { number: 123, word: "pretend", type: "verb", definition: "to make believe." },
+            { number: 124, word: "should", type: "verb", definition: "—used in auxiliary function to express what is probable or expected." },
+            { number: 125, word: "sideways", type: "adverb", definition: "in a position so as to offer only the right or left lateral part of the body." },
+            { number: 126, word: "muster", type: "verb", definition: "to bring together : to collect." },
+            { number: 127, word: "include", type: "verb", definition: "to place, list, or rate as a part or component of a whole or of a larger group, class, or aggregate." },
+            { number: 128, word: "sandwich", type: "noun", definition: "two pieces of bread with meat or cheese or a mixture of foods placed between them." },
+            { number: 129, word: "Saturn", type: "noun", definition: "the planet sixth in order from the sun that is notable for its large ring system." },
+            { number: 130, word: "violet", type: "noun", definition: "a small-flowered plant of a genus of usually spring-blooming flowers that have leafy stems and purple, yellow, or white flowers." },
+            { number: 131, word: "mighty", type: "adjective", definition: "having or wielding great power or authority." },
+            { number: 132, word: "solution", type: "noun", definition: "an answer to or a means of answering a problem : an explanation." },
+            { number: 133, word: "spiral", type: "adjective", definition: "winding around a center point and slowly moving away from or getting closer to it." },
+            { number: 134, word: "thread", type: "noun", definition: "a filament, a group of filaments twisted together, or a filamentous length formed by spinning and twisting short textile fibers into a continuous strand." },
+            { number: 135, word: "velvet", type: "noun", definition: "a clothing and upholstery fabric in a wide range of constructions and weights made of silk, rayon, cotton, nylon, or wool and characterized by a short soft dense pile." },
+            { number: 136, word: "breathe", type: "verb", definition: "to draw air into and expel it out of the lungs : to inhale and exhale." },
+            { number: 137, word: "taxicab", type: "noun", definition: "a chauffeur-driven automobile available on call to carry a passenger between any two points (as within a city) for a fare." },
+            { number: 138, word: "report", type: "noun", definition: "a usually detailed account or statement." },
+            { number: 139, word: "cobweb", type: "noun", definition: "a single thread spun by a spider." },
+            { number: 140, word: "rodent", type: "noun", definition: "an animal of an order comprising relatively small gnawing mammals." },
+            { number: 141, word: "spying", type: "verb", definition: "watching (as a person) in a furtive or stealthy manner for the purpose of secretly obtaining information for usually hostile purposes." },
+            { number: 142, word: "showed", type: "verb", definition: "gave an explanation of : taught, informed, instructed." },
+            { number: 143, word: "scribbly", type: "adjective", definition: "covered with or consisting of illegible or random marks written or drawn." },
+            { number: 144, word: "recess", type: "noun", definition: "a time between classes during the school day that is used for rest or play." },
+            { number: 145, word: "highway", type: "noun", definition: "a main direct road." },
+            { number: 146, word: "reeds", type: "plural noun", definition: "tall grasses with slender often prominently jointed stems that grow especially in wet areas." },
+            { number: 147, word: "bolts", type: "plural noun", definition: "wood or metal bars or rods used to fasten a door." },
+            { number: 148, word: "squeeze", type: "verb", definition: "to exert pressure especially on opposite sides or parts of : to press together closely or tightly." },
+            { number: 149, word: "softly", type: "adverb", definition: "in a manner that is pleasing or agreeable to the senses." },
+            { number: 150, word: "wriggle", type: "verb", definition: "to move the body or a bodily part to and fro with short writhing motions like a worm : to squirm, writhe." },
+            { number: 151, word: "motion", type: "noun", definition: "the action or process of a body passing from one place or position to another." },
+            { number: 152, word: "terror", type: "noun", definition: "a state of intense fright or apprehension : stark fear." },
+            { number: 153, word: "murky", type: "adjective", definition: "dark or dull in color." },
+            { number: 154, word: "harvest", type: "noun", definition: "the amount of any natural product that is gathered." },
+            { number: 155, word: "quill", type: "noun", definition: "a bird's feather; especially : one of the large stiff feathers of a bird's wing or tail." },
+            { number: 156, word: "patio", type: "noun", definition: "a usually paved outdoor area that is next to a building and is used for dining and relaxing." },
+            { number: 157, word: "braids", type: "plural noun", definition: "lengths of hair done up by interweaving three or more strands together." },
+            { number: 158, word: "castle", type: "noun", definition: "a large fortified building often surrounded by a moat." },
+            { number: 159, word: "costume", type: "noun", definition: "an outfit worn to create the appearance characteristic of a particular period, person, place, or thing." },
+            { number: 160, word: "wagon", type: "noun", definition: "a heavy four-wheel usually uncovered vehicle designed especially for transporting bulky commodities and drawn originally by animals." },
+            { number: 161, word: "wrench", type: "verb", definition: "twist violently to one side or out of line, shape, or position." },
+            { number: 162, word: "indeed", type: "adverb", definition: "admittedly, undeniably." },
+            { number: 163, word: "gerbils", type: "plural noun", definition: "burrowing desert rodents that have long hind legs well adapted for leaping." },
+            { number: 164, word: "village", type: "noun", definition: "a small cluster of houses and other buildings (as stores and churches) forming a unit distinct from the surrounding countryside." },
+            { number: 165, word: "critters", type: "plural noun", definition: "creatures, animals." },
+            { number: 166, word: "stifle", type: "verb", definition: "to withhold from expression : to keep in check : to repress." },
+            { number: 167, word: "dimple", type: "noun", definition: "a slight natural indentation or hollow in the surface of some part of the human body (as on a cheek or the chin)." },
+            { number: 168, word: "brother", type: "noun", definition: "a male human being considered in his relation to another person having the same parents or having one parent in common." },
+            { number: 169, word: "mistake", type: "noun", definition: "an unintentional error." },
+            { number: 170, word: "harbor", type: "noun", definition: "a small bay or other sheltered part of a considerable body of water usually well protected against high waves and strong currents and deep enough to anchor ships or other craft." },
+            { number: 171, word: "reunion", type: "noun", definition: "a meeting of persons long separated." },
+            { number: 172, word: "balloon", type: "noun", definition: "a bag of silk or other tough light material shaped usually like a sphere, made nonporous, and filled with heated air or a gas lighter than air." },
+            { number: 173, word: "promise", type: "noun", definition: "a statement that you will do or not do something specific." },
+            { number: 174, word: "uproar", type: "noun", definition: "a loud usually disorderly noise of some duration." },
+            { number: 175, word: "Wednesday", type: "noun", definition: "the day following Tuesday." },
+            { number: 176, word: "exactly", type: "adverb", definition: "precisely according to a rule, standard, or fact : accurately." },
+            { number: 177, word: "severe", type: "adjective", definition: "strict or uncompromising in judgment, discipline, or government." },
+            { number: 178, word: "twinkle", type: "verb", definition: "to shine with a flickering, sparkling, or intermittent light." },
+            { number: 179, word: "snicker", type: "verb", definition: "to laugh in a slight, covert, or partly suppressed manner (as in derision or from embarrassment)." },
+            { number: 180, word: "stumble", type: "verb", definition: "to lose one's footing in walking or running so as to stagger or fall : to trip." },
+            { number: 181, word: "smock", type: "noun", definition: "a lightweight loose garment with a front opening and worn especially for protection of clothing while working." },
+            { number: 182, word: "natural", type: "adjective", definition: "in accordance with or determined by nature : based upon the operations of the physical world." },
+            { number: 183, word: "childhood", type: "noun", definition: "the quality or state of being a young person especially between infancy and youth." },
+            { number: 184, word: "nonsense", type: "noun", definition: "something that is not capable of being understood." },
+            { number: 185, word: "bandits", type: "plural noun", definition: "those who steal, especially in a shameless or pitiless manner." },
+            { number: 186, word: "champion", type: "noun", definition: "someone whose superiority is formally acknowledged especially after a test, contest, or series of tests or contests." },
+            { number: 187, word: "superb", type: "adjective", definition: "of the highest quality." },
+            { number: 188, word: "tinge", type: "verb", definition: "to color with a slight shade or stain : to tint." },
+            { number: 189, word: "outcome", type: "noun", definition: "something that follows from an activity or process : consequence, result." },
+            { number: 190, word: "groves", type: "plural noun", definition: "smaller groups of trees than forests often without underwood and planted or growing naturally as if arranged by art." },
+            { number: 191, word: "ghostly", type: "adjective", definition: "of or relating to a mark or visible sign left by something dead, lost, or no longer present." },
+            { number: 192, word: "convince", type: "verb", definition: "to get someone to agree or believe by arguing a point." },
+            { number: 193, word: "biology", type: "noun", definition: "the science of life." },
+            { number: 194, word: "captive", type: "adjective", definition: "kept within bounds : confined." },
+            { number: 195, word: "streamers", type: "plural noun", definition: "narrow free-floating strips (as of cloth or crepe paper)." },
+            { number: 196, word: "speckled", type: "adjective", definition: "covered or marked with small marks or splotches : spotted." },
+            { number: 197, word: "hopscotch", type: "noun", definition: "a child's game in which a player tosses a small object into the lined and numbered areas outlined on the ground, hops on one foot through the figure and back to the area in which the object lies, picks it up, and hops out trying to avoid errors." },
+            { number: 198, word: "jumbled", type: "adjective", definition: "lacking order, coherence, sequence, or plan." },
+            { number: 199, word: "naughty", type: "adjective", definition: "violating accepted standards of morality, good taste, or polite behavior." },
+            { number: 200, word: "dodgy", type: "adjective", definition: "evasive, tricky." },
+            { number: 201, word: "ballerina", type: "noun", definition: "a female dancer in a form of artistic dancing." },
+            { number: 202, word: "cubism", type: "noun", definition: "the arbitrary arrangement and interrelation of contours and fragments of contours on a picture surface without necessary reference to natural objects or their structure." },
+            { number: 203, word: "interact", type: "verb", definition: "to have an effect on one another." },
+            { number: 204, word: "jerky", type: "noun", definition: "meat (as beef) that has been cut into long slices or strips and dried." },
+            { number: 205, word: "diablo", type: "noun", definition: "an extremely and malignantly wicked person : a human fiend." },
+            { number: 206, word: "ablaze", type: "adjective", definition: "on fire." },
+            { number: 207, word: "pivot", type: "noun", definition: "a dance step in which the dancer rotates on one foot and completes the step by shifting the weight to the other foot." },
+            { number: 208, word: "karate", type: "noun", definition: "a Japanese art of self-defense in which kicks and openhanded blows are delivered especially to vulnerable parts of the body." },
+            { number: 209, word: "bowler", type: "noun", definition: "a stiff felt hat with a dome-shaped crown and a rather narrow somewhat rolled brim — called also \"Derby.\"" },
+            { number: 210, word: "phantom", type: "adjective", definition: "unembodied, elusive." },
+            { number: 211, word: "locust", type: "noun", definition: "a grasshopper that frequently travels in swarms." },
+            { number: 212, word: "council", type: "noun", definition: "a somewhat permanent group elected or appointed to constitute an advisory body or a body with a degree of legislative power." },
+            { number: 213, word: "ointment", type: "noun", definition: "a salve or unguent for application to the skin; specifically : a semisolid medicinal preparation usually having a base of fatty or greasy material." },
+            { number: 214, word: "Gothic", type: "adjective", definition: "of, relating to or having the characteristics of a European style of architecture from the 12th to the 16th centuries that is characterized by slender vertical piers and counterbalancing buttresses, and with pointed arches and vaulting." },
+            { number: 215, word: "midair", type: "noun", definition: "any point or region in the air not immediately adjacent to the ground or other solid or liquid surface beneath it." },
+            { number: 216, word: "hurricane", type: "noun", definition: "a tropical cyclone with winds of 73 miles per hour or greater." },
+            { number: 217, word: "laurel", type: "noun", definition: "a recognition of superior achievement : a mark of public esteem : an honor." },
+            { number: 218, word: "lollygag", type: "verb", definition: "to fool around : to loiter, dawdle." },
+            { number: 219, word: "vermin", type: "plural noun", definition: "small common harmful animals (such as bedbugs and mice) that tend to occur in great numbers and are difficult to control." },
+            { number: 220, word: "argument", type: "noun", definition: "the act or process of contending or disagreeing in words : a disputation." },
+            { number: 221, word: "wreckage", type: "noun", definition: "the remains of the destruction, disorganization, or serious injury of something especially by violence." },
+            { number: 222, word: "dolphin", type: "noun", definition: "any of various small marine toothed whales that have the snout more or less elongated into a beak and the neck vertebrae partially fused." },
+            { number: 223, word: "infinite", type: "adjective", definition: "having no end : extending indefinitely." },
+            { number: 224, word: "bittersweet", type: "adjective", definition: "of or relating to a prepared chocolate containing little sugar." },
+            { number: 225, word: "fend", type: "verb", definition: "to look out for oneself : to manage." },
+            { number: 226, word: "disguise", type: "noun", definition: "unfamiliar or uncharacteristic style of dress worn to conceal one's identity." },
+            { number: 227, word: "membrane", type: "noun", definition: "a thin soft pliable sheet or layer especially of animal or vegetable origin." },
+            { number: 228, word: "magnolia", type: "noun", definition: "a tree or shrub that has evergreen or deciduous leaves and usually showy white, yellow, rose, or purple flowers appearing in early spring." },
+            { number: 229, word: "sensation", type: "noun", definition: "a state of excited interest or feeling." },
+            { number: 230, word: "daredevil", type: "noun", definition: "a person who without apparent fear faces, accepts, or carries out anything unusually dangerous or foolhardy." },
+            { number: 231, word: "bypass", type: "noun", definition: "a passage providing an alternative deflected route (such as a road to carry traffic around a congested district or a channel to deflect flood water)." },
+            { number: 232, word: "oysters", type: "plural noun", definition: "marine bivalve mollusks having a rough irregular shell, living free on the bottom or adhering to stones or other objects in shallow water, and feeding on minute plants and animals carried to them by the current." },
+            { number: 233, word: "military", type: "adjective", definition: "of or relating to soldiers, arms, or war." },
+            { number: 234, word: "gasket", type: "noun", definition: "a separate or attached sealer used in making and closing airtight or liquid containers to ensure tightness." },
+            { number: 235, word: "biceps", type: "noun", definition: "a muscle having two heads, such as the large flexor muscle of the front of the upper arm." },
+            { number: 236, word: "voyage", type: "noun", definition: "a journey by water : cruise." },
+            { number: 237, word: "advantage", type: "noun", definition: "a more favorable or improved position or condition." },
+            { number: 238, word: "applause", type: "noun", definition: "approval publicly expressed (as by clapping hands)." },
+            { number: 239, word: "nostrils", type: "plural noun", definition: "the external openings of the nose or nasal cavity of a vertebrate." },
+            { number: 240, word: "television", type: "noun", definition: "a medium of communication whereby images and sounds are transmitted." },
+            { number: 241, word: "mattress", type: "noun", definition: "a resilient pad for use as a resting place alone or supported on a bedstead." },
+            { number: 242, word: "soldier", type: "noun", definition: "a person engaged in military service." },
+            { number: 243, word: "trousers", type: "plural noun", definition: "an outer garment extending from the waist to the ankle or sometimes only to or just below the knee." },
+            { number: 244, word: "albums", type: "plural noun", definition: "one or more recordings produced as a single unit." },
+            { number: 245, word: "muscles", type: "plural noun", definition: "tissues that function to produce motion and are made up of variously modified elongated cells capable of contracting when stimulated." },
+            { number: 246, word: "diploma", type: "noun", definition: "a document that records that a person has completed a course or graduated from a school." },
+            { number: 247, word: "harpoons", type: "plural noun", definition: "throwing weapons used in hunting large fish and sea animals." },
+            { number: 248, word: "rampage", type: "noun", definition: "a state of being turbulently active, wildly agitated, or destructive." },
+            { number: 249, word: "levitate", type: "verb", definition: "to rise or float in the air, especially in seeming defiance of gravitation." },
+            { number: 250, word: "spritzed", type: "verb", definition: "sprayed, squirted." },
+            { number: 251, word: "clientele", type: "noun", definition: "a body of patrons or customers." },
+            { number: 252, word: "anecdotes", type: "plural noun", definition: "usually short narratives of interesting, amusing, or curious incidents often biographical and generally characterized by human interest." },
+            { number: 253, word: "haberdasher", type: "noun", definition: "a dealer in men's furnishings, such as shirts, ties, and hats." },
+            { number: 254, word: "filigree", type: "noun", definition: "ornamental work of fine wire of gold, silver, or copper that is used chiefly to decorate gold and silver surfaces." },
+            { number: 255, word: "catapults", type: "plural noun", definition: "ancient military devices used for hurling heavy missiles (as stones) or for hurling other missiles (as spears, arrows) with extreme force." },
+            { number: 256, word: "embroiled", type: "verb", definition: "involved especially in conflict or with a problem, adversaries, or the law." },
+            { number: 257, word: "burro", type: "noun", definition: "a donkey." },
+            { number: 258, word: "guava", type: "noun", definition: "the globular yellow fruit of a small shrubby tropical American tree." },
+            { number: 259, word: "crescendo", type: "noun", definition: "the peak of a gradual increase (as in physical or emotional force or intensity)." },
+            { number: 260, word: "ocelot", type: "noun", definition: "a medium-sized American wildcat ranging from Texas to Patagonia and having a tawny yellow or grayish coat that is dotted and striped with black." },
+            { number: 261, word: "onyx", type: "adjective", definition: "of the color jet black." },
+            { number: 262, word: "demigod", type: "noun", definition: "a mythological divine or semidivine being (as the offspring of a deity and a mortal)." },
+            { number: 263, word: "trek", type: "noun", definition: "a trip or movement especially when involving difficulties or complex organization." },
+            { number: 264, word: "teriyaki", type: "noun", definition: "a dish of Japanese origin consisting of meat or fish that is grilled or broiled after being marinated in a seasoned soy sauce." },
+            { number: 265, word: "contribute", type: "verb", definition: "to add (as knowledge or effort) to a common interest or activity." },
+            { number: 266, word: "hocus-pocus", type: "noun", definition: "something that confuses, misleads, or is difficult to comprehend." },
+            { number: 267, word: "narwhal", type: "noun", definition: "an arctic cetacean that has no dorsal fin, is marbled black and white in color, reaches a length of about 16 feet, and possesses in the male one or rarely two long, spirally twisted pointed tusks." },
+            { number: 268, word: "melancholy", type: "adjective", definition: "depressed in spirits : mournful." },
+            { number: 269, word: "merfolk", type: "plural noun", definition: "legendary peoples of the sea having human head, trunk, and arms and the tail of a fish." },
+            { number: 270, word: "gargoyles", type: "plural noun", definition: "spouts often having the form of a grotesque figure or animal and projecting from a roof gutter to throw rainwater clear of a building." },
+            { number: 271, word: "pavilions", type: "plural noun", definition: "light sometimes ornamental structures in gardens, parks, or places of recreation that are used for entertainment or shelter." },
+            { number: 272, word: "skeptical", type: "adjective", definition: "characterized by an attitude of doubt or disposition in regard to something particular (such as a supposed fact)." },
+            { number: 273, word: "palette", type: "noun", definition: "a particular range, quality, or use of color." },
+            { number: 274, word: "ogres", type: "plural noun", definition: "hideous giants represented in fairy tales and folklore as feeding on human beings : monsters." },
+            { number: 275, word: "goatee", type: "noun", definition: "a small trim pointed or tufted beard on a man's chin." },
+            { number: 276, word: "grotesque", type: "adjective", definition: "departing markedly from the natural, the expected or the typical (as by distortion, exaggeration) : atypical." },
+            { number: 277, word: "threshold", type: "noun", definition: "the place or point of entering or beginning : outset." },
+            { number: 278, word: "flamboyant", type: "adjective", definition: "marked by strikingly elaborate, colorful, or showy display or behavior." },
+            { number: 279, word: "famine", type: "noun", definition: "a period of extreme scarcity of food." },
+            { number: 280, word: "linoleum", type: "noun", definition: "a floor covering made by laying on a burlap or canvas backing a mixture of solidified linseed oil and various solid particles and usually pigments." },
+            { number: 281, word: "pesos", type: "plural noun", definition: "coins or currency notes representing any of the basic monetary units of Argentina, Chile, Colombia, Cuba, Dominican Republic, Mexico, and Uruguay." },
+            { number: 282, word: "rogue", type: "noun", definition: "a dishonest unprincipled person." },
+            { number: 283, word: "amnesia", type: "noun", definition: "loss of memory sometimes including the memory of personal identity." },
+            { number: 284, word: "fruition", type: "noun", definition: "completion, fulfillment." },
+            { number: 285, word: "bygone", type: "adjective", definition: "of or relating to the past." },
+            { number: 286, word: "committee", type: "noun", definition: "a group of people delegated to consider, investigate, or act on and usually to report on some matter or business." },
+            { number: 287, word: "mirage", type: "noun", definition: "an optical phenomenon observed on still days over deserts or hot pavements that has the mirrorlike appearance of a quiet pool of water." },
+            { number: 288, word: "newfangled", type: "adjective", definition: "recently made or of the most up-to-date style." },
+            { number: 289, word: "surcharge", type: "noun", definition: "a price demanded for a thing or service in excess of the usual or normal amount." },
+            { number: 290, word: "marksmanship", type: "noun", definition: "the art or skill of a person practiced at hitting a target especially with firearms." },
+            { number: 291, word: "column", type: "noun", definition: "one of a building's vertical supporting structures." },
+            { number: 292, word: "plaque", type: "noun", definition: "an inscribed metal tablet that identifies a site or commemorates an individual or event." },
+            { number: 293, word: "rebuke", type: "verb", definition: "to criticize sharply: to reprimand." },
+            { number: 294, word: "adversity", type: "noun", definition: "a condition of suffering, destitution, or affliction often implying previous prosperity or well-being." },
+            { number: 295, word: "symphony", type: "noun", definition: "a large piece for orchestra usually in three or four contrasting movements." },
+            { number: 296, word: "aquamarine", type: "noun", definition: "a pale blue to light greenish blue." },
+            { number: 297, word: "altar", type: "noun", definition: "a tablelike construction used in the Christian church in celebrating the Eucharist : communion table." },
+            { number: 298, word: "stylistic", type: "adjective", definition: "of or relating to mode of expression especially in the use of language." },
+            { number: 299, word: "flailed", type: "verb", definition: "moved, swung, or beat as though wielding an instrument for threshing grain from the ear by hand." },
+            { number: 300, word: "errands", type: "plural noun", definition: "trips made in order to deliver a message or purchase or attend to something." },
+            { number: 301, word: "spree", type: "noun", definition: "an unrestrained and usually excessive indulgence in or outburst of any activity : splurge, rampage." },
+            { number: 302, word: "steeped", type: "verb", definition: "saturated thoroughly : imbued." },
+            { number: 303, word: "smattering", type: "noun", definition: "an inconsiderable number or amount especially of similar but distinct individuals or parts : piecemeal collection." },
+            { number: 304, word: "bibliophile", type: "noun", definition: "a lover of books especially for beautiful or rare qualities of format; also : a book collector." },
+            { number: 305, word: "graphite", type: "noun", definition: "a mineral consisting of soft black lustrous carbon that conducts electricity and is used in pencils, crucibles, electrolytic anodes, as a lubricant, and as a moderator in atomic-energy plants—called also \"black lead.\"" },
+            { number: 306, word: "halo", type: "noun", definition: "the aura of glory, veneration, prestige, or sentiment surrounding an idealized person or thing." },
+            { number: 307, word: "feisty", type: "adjective", definition: "having or showing a lively aggressiveness : spunky." },
+            { number: 308, word: "transfixed", type: "verb", definition: "held motionless by or as if by piercing especially with an absorbing emotion or interest." },
+            { number: 309, word: "aluminum", type: "noun", definition: "a bluish silver-white metallic element that is the most plentiful metal in Earth's crust." },
+            { number: 310, word: "residential", type: "adjective", definition: "used as a temporary or permanent dwelling place, abode, or habitation to which one intends to return." },
+            { number: 311, word: "deposition", type: "noun", definition: "testimony taken down in writing under oath or affirmation." },
+            { number: 312, word: "veterinarian", type: "noun", definition: "one qualified and duly authorized to treat diseases of animals." },
+            { number: 313, word: "skiff", type: "noun", definition: "a light rowboat." },
+            { number: 314, word: "totem", type: "noun", definition: "an animal, plant, or other object serving as the emblem of a family or clan and often regarded as a reminder of its ancestry." },
+            { number: 315, word: "inferno", type: "noun", definition: "a large disastrous burning : a conflagration." },
+            { number: 316, word: "buzzard", type: "noun", definition: "any of various birds of prey such as a turkey vulture or a condor." },
+            { number: 317, word: "eliminate", type: "verb", definition: "to get rid of." },
+            { number: 318, word: "writhes", type: "verb", definition: "becomes twisted, contorted, or wrested about in or as if in pain or struggling." },
+            { number: 319, word: "mourners", type: "plural noun", definition: "those that are sorrowful over a death." },
+            { number: 320, word: "respiratory", type: "adjective", definition: "of or relating to breathing." },
+            { number: 321, word: "perpetrate", type: "verb", definition: "to be guilty of (a crime, an offense, etc.) : to commit." },
+            { number: 322, word: "intestines", type: "plural noun", definition: "tubular portions of the digestive tract that in the vertebrate lie posterior to the stomach from which they are separated by the pyloric valve." },
+            { number: 323, word: "sanitation", type: "noun", definition: "the application of measures to make environmental conditions favorable to health." },
+            { number: 324, word: "barren", type: "adjective", definition: "deficient in producing vegetation : bare or desolate." },
+            { number: 325, word: "lavishly", type: "adverb", definition: "in a manner characterized by profusion or excess." },
+            { number: 326, word: "suffice", type: "verb", definition: "to be enough : to meet or satisfy a need." },
+            { number: 327, word: "giddily", type: "adverb", definition: "in a manner characterized by exuberance, impulsiveness, or thoughtlessness." },
+            { number: 328, word: "tiff", type: "noun", definition: "a slight fit of anger : an outburst of temper or spite : a petty quarrel." },
+            { number: 329, word: "leeward", type: "adjective", definition: "situated away from the wind : downwind." },
+            { number: 330, word: "hurly-burly", type: "noun", definition: "confusion, turmoil, uproar." },
+            { number: 331, word: "monotone", type: "noun", definition: "a succession of syllables, words, or sentences in one unvaried key or pitch." },
+            { number: 332, word: "parroting", type: "verb", definition: "imitating the form of without understanding the sense or meaning involved." },
+            { number: 333, word: "techie", type: "noun", definition: "a person who is very knowledgeable or enthusiastic about the science of the application of knowledge to practical purposes." },
+            { number: 334, word: "gruesome", type: "adjective", definition: "inspiring horror or repulsion : fearful, grisly, hideous." },
+            { number: 335, word: "tsunami", type: "noun", definition: "a great sea wave produced by submarine earth movement or volcanic eruption : a tidal wave." },
+            { number: 336, word: "anomaly", type: "noun", definition: "something deviating from a general rule, method, or analogy : something irregular or abnormal." },
+            { number: 337, word: "banishment", type: "noun", definition: "legal expulsion from a country." },
+            { number: 338, word: "magenta", type: "noun", definition: "a deep purplish red." },
+            { number: 339, word: "conveyance", type: "noun", definition: "the action of transporting : transportation." },
+            { number: 340, word: "cohort", type: "noun", definition: "company, band, group." },
+            { number: 341, word: "kindling", type: "noun", definition: "easily combustible material of a convenient size for starting a fire." },
+            { number: 342, word: "treachery", type: "noun", definition: "betrayal of trust." },
+            { number: 343, word: "mañana", type: "adverb", definition: "at an indefinite time in the future – used chiefly in the Southwest." },
+            { number: 344, word: "squeal", type: "verb", definition: "to cry with a sharp shrill prolonged sound." },
+            { number: 345, word: "tersely", type: "adverb", definition: "in a brief and concise manner." },
+            { number: 346, word: "autism", type: "noun", definition: "a developmental disorder that typically appears by age three and that is variable in expression but is recognized and diagnosed by impairment of the ability to form social relationships, by impairment of the ability to communicate with others, and by stereotyped behavior patterns." },
+            { number: 347, word: "foyer", type: "noun", definition: "an anteroom or lobby especially of a theater, library, or other public building." },
+            { number: 348, word: "straightforward", type: "adjective", definition: "free from the use of an unnecessarily large number of words to express an idea : direct or not roundabout in expression." },
+            { number: 349, word: "vial", type: "noun", definition: "a small vessel for liquids." },
+            { number: 350, word: "foist", type: "verb", definition: "to force another to accept especially by stealth or deceit." },
+            { number: 351, word: "Samhain", type: "noun", definition: "the evening preceding All Saints' Day : Halloween." },
+            { number: 352, word: "crystalline", type: "adjective", definition: "transparent, pure, pellucid." },
+            { number: 353, word: "sentient", type: "adjective", definition: "conscious or capable of fine distinctions or perceptions : sensitive." },
+            { number: 354, word: "technicalities", type: "plural noun", definition: "details that have meaning only for the specialist." },
+            { number: 355, word: "crannies", type: "plural noun", definition: "small obscure clefts, corners, or closed spaces that are easy to overlook and are likely places for concealing something or for hiding." },
+            { number: 356, word: "incorporeal", type: "adjective", definition: "having no material body or form : not consisting of matter." },
+            { number: 357, word: "Tlingit", type: "noun", definition: "a group of Indian peoples of the islands and coast of southern Alaska." },
+            { number: 358, word: "detainees", type: "plural noun", definition: "persons held in custody for political reasons." },
+            { number: 359, word: "delinquent", type: "noun", definition: "a transgressor against duty or law especially in a degree not constituting crime." },
+            { number: 360, word: "grudgingly", type: "adverb", definition: "in a manner that is unwilling, reluctant, illiberal, or ungenerous." },
+            { number: 361, word: "smoldering", type: "verb", definition: "wasting away by slow combustion." },
+            { number: 362, word: "karma", type: "noun", definition: "the sum total of the ethical consequences of a person's good or bad actions comprising thoughts, words, and deeds that is held in Hinduism and Buddhism to determine one's specific destiny in one's next existence." },
+            { number: 363, word: "Cyclops", type: "noun", definition: "one of a race of giants in Greek mythology with a single eye in the middle of the forehead." },
+            { number: 364, word: "translucent", type: "adjective", definition: "admitting and diffusing light so that objects beyond cannot be clearly distinguished : partly transparent." },
+            { number: 365, word: "glabrous", type: "adjective", definition: "having a smooth even surface : free of roughness; specifically : having an epidermal covering that is totally or relatively devoid of hairs or down." },
+            { number: 366, word: "gondolas", type: "plural noun", definition: "long narrow flat-bottomed boats with a high prow and stern used on the canals of Venice." },
+            { number: 367, word: "pentameter", type: "noun", definition: "a line of five metrical feet." },
+            { number: 368, word: "chlorofluorocarbon", type: "noun", definition: "any of several simple gaseous compounds used as refrigerants, cleaning solvents, and aerosol propellants and in the manufacture of plastic foams, and that are believed to be a major cause of stratospheric ozone depletion." },
+            { number: 369, word: "impeccable", type: "adjective", definition: "free from fault or blame : flawless." },
+            { number: 370, word: "inimitable", type: "adjective", definition: "not capable of being copied : matchless." },
+            { number: 371, word: "euphoria", type: "noun", definition: "a feeling of well-being or elation." },
+            { number: 372, word: "Euphrates", type: "geographical entry", definition: "river 1,700 miles long in southwestern Asia flowing from eastern Turkey southeast through Syria and Iraq to unite with the Tigris forming the Shatt al Arab." },
+            { number: 373, word: "artificial", type: "adjective", definition: "produced by human beings and intended to imitate something in nature : simulated." },
+            { number: 374, word: "villainous", type: "adjective", definition: "highly objectionable : mean, bad, wretched, vile, detestable." },
+            { number: 375, word: "ruffian", type: "noun", definition: "a coarse, brutal, or cruel fellow." },
+            { number: 376, word: "buccaneer", type: "noun", definition: "one of the pirates preying upon Spanish ships and settlements especially in the West Indies in the seventeenth century." },
+            { number: 377, word: "lubbers", type: "plural noun", definition: "clumsy or unskilled seamen." },
+            { number: 378, word: "louis d'or", type: "noun", definition: "a French gold coin first struck in 1640 and issued up to the Revolution." },
+            { number: 379, word: "ambiguity", type: "noun", definition: "the condition of admitting of two or more meanings, of being understood in more than one way, or of referring to two or more things at the same time." },
+            { number: 380, word: "cache", type: "noun", definition: "something that is hidden or stored in a secret or secure place." },
+            { number: 381, word: "Madagascar", type: "geographical entry", definition: "an island in the western Indian Ocean off southeastern Africa that is known for its unique flora and fauna." },
+            { number: 382, word: "catechism", type: "noun", definition: "a manual or guide for systematic instruction (as for moral and religious instruction) sometimes in the form of a comprehensive summary of doctrine and often in the form of questions and answers." },
+            { number: 383, word: "lieutenant", type: "noun", definition: "a commissioned officer in the army, navy, air force, or marine corps." },
+            { number: 384, word: "cavalier", type: "adjective", definition: "given to airy dismissal of things worthy of attention." },
+            { number: 385, word: "circumspectly", type: "adverb", definition: "in a manner marked by caution and earnest attention to all significant circumstances and possible consequences of action." },
+            { number: 386, word: "Chernobyl", type: "geographical entry", definition: "site in northern Ukraine of a town abandoned after a nuclear accident nearby in 1986." },
+            { number: 387, word: "algebraic", type: "adjective", definition: "of, relating to, involving, or according to the laws of a branch of mathematics in which arithmetic relations are generalized and explored by using letter symbols to represent numbers, variable quantities, or other mathematical entities." },
+            { number: 388, word: "hydraulics", type: "plural noun", definition: "a branch of science that deals with practical applications (as the transmission of energy or the effects of flow) of water or other liquid in motion." },
+            { number: 389, word: "klystron", type: "noun", definition: "an electron tube in which bunching of electrons is produced by subjecting them to acceleration and deceleration by high potential across a gap and which is used for the generation and amplification of ultrahigh-frequency current (as in radar)." },
+            { number: 390, word: "fuselage", type: "noun", definition: "the central body portion of an airplane designed to accommodate the crew and the passengers or cargo." },
+            { number: 391, word: "grosgrain", type: "noun", definition: "a firm fabric in plain weave usually with a silk or rayon warp and a heavy cotton filling that forms pronounced crosswise ribs." },
+            { number: 392, word: "Byzantine", type: "adjective", definition: "having the characteristics of an architecture developed in the eastern Roman Empire having as its chief decorative feature the incrustation of walls with marble veneering and with richly colored mosaic on grounds of gold." },
+            { number: 393, word: "objet d'art", type: "noun", definition: "an article of artistic worth." },
+            { number: 394, word: "séance", type: "noun", definition: "a meeting for the purpose of receiving spirit communications." },
+            { number: 395, word: "reticule", type: "noun", definition: "a woman's small drawstring bag used as a pocketbook, workbag, or carryall." },
+            { number: 396, word: "defibrillator", type: "noun", definition: "a device that restores the heart's normal rhythm." },
+            { number: 397, word: "rookery", type: "noun", definition: "a breeding ground or common haunt of gregarious birds or animals (as herons, penguins, or seals); also : a colony of such birds or animals." },
+            { number: 398, word: "vociferous", type: "adjective", definition: "marked by or given to ready vehement insistent outcry." },
+            { number: 399, word: "Carmelite", type: "noun", definition: "a member of a Roman Catholic mendicant order founded in the 12th century." },
+            { number: 400, word: "cascabel", type: "noun", definition: "a vicious South and Central American rattlesnake that has a powerful neurotoxic venom and is the only rattlesnake of eastern South America." },
+            { number: 401, word: "San Joaquin", type: "geographical entry", definition: "a river in central California flowing from the Sierra Nevada southwest and then northwest into the Sacramento River." },
+            { number: 402, word: "cabeza", type: "noun", definition: "the head of a person or animal." },
+            { number: 403, word: "imperator", type: "noun", definition: "supreme leader especially of the ancient Romans : commander, emperor." },
+            { number: 404, word: "physician", type: "noun", definition: "one duly authorized to treat disease : a doctor of medicine." },
+            { number: 405, word: "symbolizes", type: "verb", definition: "serves as something that stands for or suggests something else by reason of relationship, association, convention, or accidental but not intentional resemblance." },
+            { number: 406, word: "camouflaged", type: "verb", definition: "concealed by means of disguise." },
+            { number: 407, word: "piñon", type: "noun", definition: "the nutlike seed of a low-growing nut pine of western North America used especially in confectionery." },
+            { number: 408, word: "dysfunctional", type: "adjective", definition: "related to a trait or condition failing to serve a useful or adjustive purpose in society." },
+            { number: 409, word: "creosote", type: "noun", definition: "a dark brown or black flammable tar deposited from especially wood smoke on the walls of a chimney." },
+            { number: 410, word: "gravelly", type: "adjective", definition: "harsh and usually irritating or unpleasant — used especially of the human voice." },
+            { number: 411, word: "keening", type: "adjective", definition: "having the quality of or suggesting a lamentation or cry of grief." },
+            { number: 412, word: "probation", type: "noun", definition: "the action of suspending the sentence of a convicted offender in such a way that the offender is given freedom after promising good behavior and agreeing to a varying degree of supervision." },
+            { number: 413, word: "aesthetic", type: "adjective", definition: "relating to the beautiful as distinguished from the merely pleasing, the moral, and especially the useful and utilitarian." },
+            { number: 414, word: "suffocate", type: "verb", definition: "to die from being unable to breathe." },
+            { number: 415, word: "endowed", type: "verb", definition: "furnished (as an institution) with an income." },
+            { number: 416, word: "violence", type: "noun", definition: "intense, turbulent, or furious action, force, or feeling often destructive." },
+            { number: 417, word: "immunization", type: "noun", definition: "the creation of a condition of being able to resist a particular disease." },
+            { number: 418, word: "assizes", type: "plural noun", definition: "former periodical sessions of the judges of the superior courts in every county of England for the purpose of administering justice in the trial and determination of civil and criminal cases." },
+            { number: 419, word: "stockade", type: "noun", definition: "a line of stout posts or timbers set firmly in the earth in contact with each other, usually furnished with loopholes, and designed to form a barrier or defensive fortification." },
+            { number: 420, word: "gallipot", type: "noun", definition: "a small usually ceramic vessel with a small mouth; especially : one used by apothecaries to hold medicines." },
+            { number: 421, word: "Olympics", type: "plural noun", definition: "a modified revival of a Panhellenic festival originating in Athens in 1896, held once every four years, and consisting of international athletic contests." },
+            { number: 422, word: "miscreant", type: "noun", definition: "one who behaves criminally or viciously." },
+            { number: 423, word: "Aquitaine", type: "geographical entry", definition: "historical region of southwestern France whose capital was Toulouse." },
+            { number: 424, word: "muttonchops", type: "plural noun", definition: "side-whiskers that are narrow at the temple and broad and round by the lower jaws." },
+            { number: 425, word: "charade", type: "noun", definition: "an almost transparent pretense." },
+            { number: 426, word: "relegated", type: "verb", definition: "degraded : demoted." },
+            { number: 427, word: "conspiratorial", type: "adjective", definition: "suggestive of an agreement manifesting itself in words or deeds and made by two or more persons confederating to do an unlawful act." },
+            { number: 428, word: "puppeteer", type: "noun", definition: "one who manipulates small-scale figures of humans or other living beings." },
+            { number: 429, word: "gullet", type: "noun", definition: "the tube by which food passes from the pharynx to the stomach : the esophagus." },
+            { number: 430, word: "rancid", type: "adjective", definition: "having an offensive smell or taste usually from chemical change or decomposition." },
+            { number: 431, word: "consensus", type: "noun", definition: "collective opinion : the judgment arrived at by most of those concerned." },
+            { number: 432, word: "accommodations", type: "plural noun", definition: "lodgings, food, and services (as at a hotel)." },
+            { number: 433, word: "emblem", type: "noun", definition: "a device, symbol, design, or figure adopted and used as an identifying mark." },
+            { number: 434, word: "recoil", type: "verb", definition: "to shrink back especially with a sudden movement (as in horror, fear, disgust) : to move suddenly backward or away." },
+            { number: 435, word: "upholstery", type: "noun", definition: "the materials (as fabric, padding, and springs) used to make a soft covering especially for a seat; specifically : the fabric used to cover a seat." },
+            { number: 436, word: "effectual", type: "adjective", definition: "characterized by adequate power to produce an intended result." },
+            { number: 437, word: "acquaintance", type: "noun", definition: "a not particularly close or intimate friend : a person with whom one has had some social contact but for whom one has no strong personal attachment." },
+            { number: 438, word: "fandango", type: "noun", definition: "a lively Spanish dance usually performed by a man and woman with castanets and in triple time." },
+            { number: 439, word: "puncheon", type: "noun", definition: "a large cask of varying capacity." },
+            { number: 440, word: "operant", type: "adjective", definition: "relating to conditioning in which the desired behavior or increasingly closer approximations to it are followed by a rewarding or reinforcing stimulus — used in psychology." },
+            { number: 441, word: "infrastructure", type: "noun", definition: "the system of public works of a country, state, or region." },
+            { number: 442, word: "alighted", type: "verb", definition: "descended from or as if from the air and come to rest : landed, settled." },
+            { number: 443, word: "Canterbury", type: "adjective", definition: "of or from the city of the same name in England." },
+            { number: 444, word: "barista", type: "noun", definition: "a person whose job is to prepare and serve coffee and similar drinks (such as espresso)." },
+            { number: 445, word: "Choctaws", type: "plural noun", definition: "members of a Muskogean people of Mississippi, Alabama, and Louisiana." },
+            { number: 446, word: "prosecutor", type: "noun", definition: "an attorney who conducts proceedings especially of a criminal nature in a court on behalf of the government." },
+            { number: 447, word: "noncommittal", type: "adjective", definition: "taking no clear position or giving no clear indication of attitude, feeling, or point of view." },
+            { number: 448, word: "eulogy", type: "noun", definition: "a composition (as a set oration) in commendation of someone or something (as of the character and services of a deceased person)." },
+            { number: 449, word: "regales", type: "verb", definition: "gives pleasure or amusement to : affects pleasurably." },
+            { number: 450, word: "psychometry", type: "noun", definition: "divination of facts concerning an object or its owner through contact with or proximity to the object." }
+        ];
+
+        // Speech synthesis setup
+        let synth = window.speechSynthesis;
+        let voices = [];
+        // API key now handled securely by backend
+        let audioCache = {};
+
+        function loadVoices() {
+            voices = synth.getVoices();
+        }
+
+        if (synth.onvoiceschanged !== undefined) {
+            synth.onvoiceschanged = loadVoices;
+        }
+        loadVoices();
+
+        // OpenAI TTS Integration
+        async function generateAIAudio(text, voice = 'nova', rate = 0.9) {
+            // Track AI speech usage
+            trackUserAction('ai_speech');
+
+            // Enhanced text cleaning to prevent truncation
+            let cleanText = text.trim();
+            if (!cleanText) {
+                throw new Error('Empty text provided');
+            }
+
+            // Minimal cleaning - only remove truly problematic characters
+            cleanText = cleanText.replace(/[<>]/g, ''); // Remove only angle brackets that might break XML
+            if (!cleanText) {
+                throw new Error('No valid text after cleaning');
+            }
+
+            // Add a small pause after the word to ensure it's not cut off
+            cleanText = cleanText + ". "
+
+            const cacheKey = `${voice}-${cleanText}-${rate}`;
+            if (audioCache[cacheKey]) {
+                return audioCache[cacheKey];
+            }
+
+            try {
+                console.log(`🤖 Generating AI audio for: "${cleanText}" with voice: ${voice}`);
+
+                // Initialize session if not already done
+                if (!userSessionId) {
+                    await initializeSession();
+                }
+
+                // Create AbortController with timeout
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 10000);
+
+                const response = await fetch('/api/tts', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        text: cleanText,
+                        voice: voice,
+                        speed: Math.max(0.25, Math.min(4.0, rate)),
+                        sessionId: userSessionId
+                    }),
+                    signal: controller.signal
+                });
+
+                clearTimeout(timeoutId);
+
+                if (!response.ok) {
+                    const errorData = await response.json().catch(() => ({}));
+                    throw new Error(errorData.error || `Server Error: ${response.status}`);
+                }
+
+                const audioBlob = await response.blob();
+
+                // Enhanced blob validation
+                if (audioBlob.size === 0) {
+                    throw new Error('Received empty audio blob');
+                }
+
+                // Check if blob is too small (might indicate truncation)
+                if (audioBlob.size < 2000) {
+                    console.warn(`Audio blob for "${text}" is quite small (${audioBlob.size} bytes), possible truncation`);
+                }
+
+                const audioUrl = URL.createObjectURL(audioBlob);
+                audioCache[cacheKey] = audioUrl;
+                console.log(`✅ AI audio generated successfully for: "${cleanText}"`);
+                return audioUrl;
+            } catch (error) {
+                console.error('AI TTS Error:', error);
+
+                if (error.name === 'AbortError') {
+                    throw new Error('Speech generation timed out. Please try again.');
+                } else if (error.message.includes('timeout')) {
+                    throw new Error('Request timeout. Please try again.');
+                } else {
+                    throw error;
+                }
+            }
+        }
+
+        async function playAIAudio(audioUrl) {
+            return new Promise((resolve, reject) => {
+                const audio = new Audio(audioUrl);
+
+                // Set maximum volume for AI audio
+                audio.volume = 1.0;
+
+                // Better error handling
+                audio.onerror = function(e) {
+                    console.error('Audio playback error:', e);
+                    reject(new Error('Failed to play audio'));
+                };
+
+                audio.onended = function() {
+                    console.log('✅ Audio playback completed');
+                    resolve();
+                };
+
+                // Ensure audio is ready before playing
+                audio.oncanplaythrough = function() {
+                    console.log('🎵 Audio ready, starting playback');
+                };
+
+                // Start playing
+                audio.play().catch(reject);
+            });
+        }
+
+        async function speakWordAI(word, rate = 0.9) {
+            // Stop any current speech
+            synth.cancel();
+
+            // Enhanced word cleaning to prevent truncation
+            let cleanWord = word.trim();
+            if (!cleanWord) {
+                console.error('Empty word provided to speakWordAI');
+                return;
+            }
+
+            // Minimal cleaning - only remove truly problematic characters
+            cleanWord = cleanWord.replace(/[<>]/g, ''); // Remove only angle brackets that might break XML
+            if (!cleanWord) {
+                console.error('No valid characters in word after cleaning');
+                return;
+            }
+
+            console.log(`🤖 AI Speaking word: "${cleanWord}"`);
+
+            // Find all AI buttons to temporarily disable them
+            const aiButtons = document.querySelectorAll('.ai-btn');
+            const originalContent = [];
+
+            try {
+                // API key validation no longer needed - handled by backend
+
+                // Show loading state on all AI buttons
+                aiButtons.forEach((btn, index) => {
+                    originalContent[index] = btn.innerHTML;
+                    btn.disabled = true;
+                    btn.innerHTML = '⏳ Loading...';
+                });
+
+                // Use optimized rate for better clarity - slower for AI voices sounds better
+                const optimizedRate = Math.min(1.0, Math.max(0.8, rate));
+
+                console.log(`🎯 Generating audio for "${cleanWord}" at optimized rate ${optimizedRate}`);
+                const audioUrl = await generateAIAudio(cleanWord, 'nova', optimizedRate);
+
+                console.log(`🎵 Playing audio for "${cleanWord}"`);
+                await playAIAudio(audioUrl);
+
+                console.log(`✅ AI speech completed successfully for: "${cleanWord}"`);
+            } catch (error) {
+                console.error('AI Speech error:', error);
+
+                // Show user-friendly error messages
+                if (error.message.includes('API key')) {
+                    alert('❌ API Key Issue: Please check your OpenAI API key and try again.');
+                } else if (error.message.includes('network') || error.message.includes('fetch')) {
+                    alert('🌐 Network Error: Please check your internet connection and try again.');
+                } else if (error.message.includes('quota') || error.message.includes('billing')) {
+                    alert('💳 Usage Limit: Please check your OpenAI account billing and usage limits.');
+                } else {
+                    alert('❌ AI speech failed. Please try again in a moment.');
+                }
+            } finally {
+                // Reset all button states
+                aiButtons.forEach((btn, index) => {
+                    btn.disabled = false;
+                    btn.innerHTML = originalContent[index] || '🤖 AI Speak';
+                });
+            }
+        }
+
+        function setApiKey() {
+            const key = prompt('Enter your OpenAI API Key:\n\nYou can get one from: https://platform.openai.com/api-keys\n\nThis key is stored locally in your browser and never sent anywhere except OpenAI.');
+            if (key && key.trim()) {
+                openaiApiKey = key.trim();
+                localStorage.setItem('openai_api_key', key.trim());
+                updateVoiceStatus();
+
+                // Show success message with clear indication
+                const successMsg = `✅ AI API Key Successfully Stored!\n\n🤖 You can now use natural AI voices:\n• Nova - Youthful & Energetic\n• Shimmer - Warm & Soothing\n• Alloy - Clear & Professional\n\n🔒 Your key is stored securely in your browser only.`;
+                alert(successMsg);
+
+                // Update the UI to show AI is active
+                updateVoiceStatus();
+            }
+        }
+
+        function updateVoiceStatus() {
+            const statusElement = document.getElementById('voiceStatus');
+            const aiInfo = document.getElementById('aiInfo');
+
+            // Show status based on whether API key is set
+            if (openaiApiKey) {
+                statusElement.innerHTML = '<span class="status-text status-ai">🤖 AI Ready: Nova (Default)</span>';
+                if (aiInfo) aiInfo.style.display = 'none';
+            } else {
+                statusElement.innerHTML = '<span class="status-text">🎤 Browser Voice | 🤖 Set API Key for AI</span>';
+                if (aiInfo) aiInfo.style.display = 'block';
+            }
+        }
+
+        // Database functions using localStorage - PERSISTENT ACROSS SESSIONS
+        function getWordStatus(wordNumber) {
+            try {
+                const data = localStorage.getItem('spellingBeeProgress');
+                if (!data) return null;
+                const progress = JSON.parse(data);
+                return progress[wordNumber] || null;
+            } catch (error) {
+                console.error('Error reading word status:', error);
+                return null;
+            }
+        }
+
+        async function setWordStatus(wordNumber, status) {
+            try {
+                // Initialize session if not already done
+                if (!userSessionId) {
+                    await initializeSession();
+                }
+
+                // Track word practice
+                trackUserAction('practiced');
+
+                const data = localStorage.getItem('spellingBeeProgress');
+                const progress = data ? JSON.parse(data) : {};
+                progress[wordNumber] = {
+                    status: status,
+                    timestamp: new Date().toISOString(),
+                    attempts: (progress[wordNumber]?.attempts || 0) + 1
+                };
+                localStorage.setItem('spellingBeeProgress', JSON.stringify(progress));
+                console.log(`💾 Saved progress for word #${wordNumber}: ${status}`);
+                updateStats();
+                updateDataStatus();
+            } catch (error) {
+                console.error('Error saving word status:', error);
+                alert('Failed to save progress. Check browser storage.');
+            }
+        }
+
+        function clearWordStatus(wordNumber) {
+            try {
+                const data = localStorage.getItem('spellingBeeProgress');
+                if (!data) return;
+                const progress = JSON.parse(data);
+                delete progress[wordNumber];
+                localStorage.setItem('spellingBeeProgress', JSON.stringify(progress));
+                console.log(`🗑️ Cleared progress for word #${wordNumber}`);
+                updateStats();
+                updateDataStatus();
+            } catch (error) {
+                console.error('Error clearing word status:', error);
+            }
+        }
+
+        // Data management functions
+        function updateDataStatus() {
+            try {
+                const progress = JSON.parse(localStorage.getItem('spellingBeeProgress') || '{}');
+                const apiKey = localStorage.getItem('openai_api_key');
+                const voicePreference = localStorage.getItem('preferred_voice');
+
+                const wordCount = Object.keys(progress).length;
+                const hasApiKey = !!apiKey;
+
+                const statusText = `💾 ${wordCount} words saved ${hasApiKey ? '+ API key' : ''}`;
+                document.getElementById('dataInfo').innerHTML = `<span class="data-status">${statusText}</span>`;
+            } catch (error) {
+                console.error('Error updating data status:', error);
+            }
+        }
+
+        function exportProgress() {
+            try {
+                const progress = JSON.parse(localStorage.getItem('spellingBeeProgress') || '{}');
+                const apiKey = localStorage.getItem('openai_api_key');
+                const voicePreference = localStorage.getItem('preferred_voice') || 'browser';
+
+                const exportData = {
+                    version: '1.0',
+                    exportDate: new Date().toISOString(),
+                    progress: progress,
+                    settings: {
+                        hasApiKey: !!apiKey,
+                        voicePreference: voicePreference
+                    }
+                };
+
+                const blob = new Blob([JSON.stringify(exportData, null, 2)], {type: 'application/json'});
+                const url = URL.createObjectURL(blob);
+
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `spelling-bee-progress-${new Date().toISOString().split('T')[0]}.json`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+
+                alert('✅ Progress exported successfully!\nFile saved to Downloads folder.');
+            } catch (error) {
+                console.error('Export error:', error);
+                alert('❌ Failed to export data.');
+            }
+        }
+
+        function importProgress() {
+            document.getElementById('importFile').click();
+        }
+
+        function handleImportFile(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const importData = JSON.parse(e.target.result);
+
+                    if (importData.progress) {
+                        const confirmMsg = `Import ${Object.keys(importData.progress).length} word statuses?\n\nThis will merge with your current progress.\nExisting word statuses will be overwritten.`;
+
+                        if (confirm(confirmMsg)) {
+                            const currentProgress = JSON.parse(localStorage.getItem('spellingBeeProgress') || '{}');
+                            const mergedProgress = { ...currentProgress, ...importData.progress };
+
+                            localStorage.setItem('spellingBeeProgress', JSON.stringify(mergedProgress));
+
+                            if (importData.settings?.voicePreference) {
+                                localStorage.setItem('preferred_voice', importData.settings.voicePreference);
+                            }
+
+                            renderWords();
+                            updateStats();
+                            updateDataStatus();
+
+                            alert(`✅ Successfully imported ${Object.keys(importData.progress).length} word statuses!`);
+                        }
+                    } else {
+                        alert('❌ Invalid import file format.');
+                    }
+                } catch (error) {
+                    console.error('Import error:', error);
+                    alert('❌ Failed to import data. Invalid file format.');
+                }
+            };
+            reader.readAsText(file);
+        }
+
+
+        // Speech functions
+        function getBestVoice() {
+            if (voices.length === 0) {
+                voices = synth.getVoices();
+            }
+
+            const preferredVoices = [
+                'Samantha', 'Karen', 'Victoria', 'Susan', 'Allison',
+                'Ava', 'Zoe', 'Kate', 'Tessa'
+            ];
+
+            for (let voiceName of preferredVoices) {
+                const voice = voices.find(v =>
+                    v.name.includes(voiceName) && v.lang.includes('en')
+                );
+                if (voice) return voice;
+            }
+
+            const englishVoices = voices.filter(voice =>
+                voice.lang.includes('en-US') || voice.lang.includes('en-GB')
+            );
+
+            const highQualityVoice = englishVoices.find(voice =>
+                !voice.name.toLowerCase().includes('compact') &&
+                !voice.name.toLowerCase().includes('enhanced')
+            );
+
+            return highQualityVoice || englishVoices[0] || voices[0];
+        }
+
+        function createUtterance(text, rate = 0.7, pitch = 1.0) {
+            const utterance = new SpeechSynthesisUtterance(text);
+            const voice = getBestVoice();
+
+            if (voice) {
+                utterance.voice = voice;
+            }
+
+            utterance.rate = rate;
+            utterance.pitch = pitch;
+            utterance.volume = 0.9;
+
+            return utterance;
+        }
+
+        async function speakWord(word, rate = 0.75) {
+            // Initialize session if not already done
+            if (!userSessionId) {
+                await initializeSession();
+            }
+
+            // Track classic speech usage
+            trackUserAction('classic_speech');
+
+            // Always use browser voice for regular speak buttons
+            const selectedVoice = 'browser';
+
+            // Stop any current speech
+            synth.cancel();
+
+            // Clean the word and validate
+            const cleanWord = word.trim();
+            if (!cleanWord) {
+                console.error('Empty word provided to speakWord');
+                return;
+            }
+
+            console.log(`🔊 Speaking word: "${cleanWord}" with voice: ${selectedVoice}`);
+
+            try {
+                if (selectedVoice !== 'browser' && openaiApiKey) {
+                    // Use AI voice with appropriate speed
+                    const speed = rate === 0.4 ? 0.6 : 0.9; // Adjust for AI voice
+                    console.log(`🤖 Using AI voice: ${selectedVoice} at speed: ${speed}`);
+                    const audioUrl = await generateAIAudio(cleanWord, selectedVoice, speed);
+                    await playAIAudio(audioUrl);
+                    console.log(`✅ AI speech completed for: "${cleanWord}"`);
+                } else {
+                    // Use browser voice
+                    console.log(`🌐 Using browser voice for: "${cleanWord}"`);
+                    const utterance = createUtterance(cleanWord, rate, 1.0);
+                    setTimeout(() => {
+                        synth.speak(utterance);
+                    }, 100);
+                }
+            } catch (error) {
+                console.error('Speech error for word:', cleanWord, error);
+
+                // Fallback to browser voice
+                console.log(`🔄 Falling back to browser voice for: "${cleanWord}"`);
+                const utterance = createUtterance(cleanWord, rate, 1.0);
+                setTimeout(() => {
+                    synth.speak(utterance);
+                }, 100);
+
+                // Show user-friendly error message
+                if (error.message.includes('API Error') || error.message.includes('401')) {
+                    alert('❌ AI voice failed. Please check your API key.\n🔄 Using browser voice as fallback.');
+                } else {
+                    console.warn('AI voice temporarily unavailable, using browser voice');
+                }
+            }
+        }
+
+        // UI functions
+        function updateStats() {
+            const data = localStorage.getItem('spellingBeeProgress');
+            const progress = data ? JSON.parse(data) : {};
+
+            let correctCount = 0;
+            let incorrectCount = 0;
+
+            Object.values(progress).forEach(item => {
+                if (item.status === 'correct') correctCount++;
+                else if (item.status === 'incorrect') incorrectCount++;
+            });
+
+            const untestedCount = 450 - correctCount - incorrectCount;
+            const progressPercent = Math.round(((correctCount + incorrectCount) / 450) * 100);
+
+            document.getElementById('correctCount').textContent = correctCount;
+            document.getElementById('incorrectCount').textContent = incorrectCount;
+            document.getElementById('untestedCount').textContent = untestedCount;
+            document.getElementById('progressPercent').textContent = progressPercent + '%';
+        }
+
+        function formatTimestamp(timestamp) {
+            const date = new Date(timestamp);
+            return date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+        }
+
+        function createWordItem(wordData) {
+            const status = getWordStatus(wordData.number);
+            const statusClass = status ? status.status : 'untested';
+
+            return `
+                <div class="word-item ${statusClass}" data-word-number="${wordData.number}">
+                    <div class="word-header">
+                        <span class="word-number">#${wordData.number}</span>
+                    </div>
+                    <div class="word-text">${wordData.word}</div>
+                    <div class="word-type">${wordData.type}</div>
+                    <div class="word-definition">${wordData.definition}</div>
+                    <div class="word-controls">
+                        <button class="speak-btn" onclick="speakWord('${wordData.word}')">
+                            🔊 Classic Speak
+                        </button>
+                        <button class="slow-btn" onclick="speakWord('${wordData.word}', 0.4)">
+                            🐌 Classic Slow
+                        </button>
+                        <button class="ai-btn" onclick="speakWordAI('${wordData.word}')">
+                            🤖 AI Speak
+                        </button>
+                        <div class="status-buttons">
+                            <button class="status-btn correct-btn ${status?.status === 'correct' ? 'active' : ''}"
+                                    onclick="setWordStatus(${wordData.number}, 'correct'); renderWords()">
+                                ✓ Correct
+                            </button>
+                            <button class="status-btn incorrect-btn ${status?.status === 'incorrect' ? 'active' : ''}"
+                                    onclick="setWordStatus(${wordData.number}, 'incorrect'); renderWords()">
+                                ✗ Incorrect
+                            </button>
+                            <button class="status-btn clear-btn"
+                                    onclick="clearWordStatus(${wordData.number}); renderWords()">
+                                Clear
+                            </button>
+                        </div>
+                    </div>
+                    ${status ? `<div class="last-attempt">Last attempt: ${formatTimestamp(status.timestamp)} (${status.attempts} attempts)</div>` : ''}
+                </div>
+            `;
+        }
+
+        function getSectionStats(start, end) {
+            let correct = 0, incorrect = 0, untested = 0;
+
+            for (let i = start; i <= end; i++) {
+                const status = getWordStatus(i);
+                if (!status) {
+                    untested++;
+                } else if (status.status === 'correct') {
+                    correct++;
+                } else if (status.status === 'incorrect') {
+                    incorrect++;
+                }
+            }
+
+            return { correct, incorrect, untested };
+        }
+
+        function createSection(start, end, words) {
+            const sectionWords = words.filter(word => word.number >= start && word.number <= end);
+            const stats = getSectionStats(start, end);
+
+            const wordItems = sectionWords.map(createWordItem).join('');
+
+            return `
+                <div class="section" data-start="${start}" data-end="${end}">
+                    <div class="section-header" onclick="toggleSection(this)">
+                        <div class="section-title">Words ${start}-${end}</div>
+                        <div class="section-stats">
+                            <div class="section-stat stat-correct">
+                                <span>✓</span> <span>${stats.correct}</span>
+                            </div>
+                            <div class="section-stat stat-incorrect">
+                                <span>✗</span> <span>${stats.incorrect}</span>
+                            </div>
+                            <div class="section-stat stat-untested">
+                                <span>○</span> <span>${stats.untested}</span>
+                            </div>
+                            <div class="section-toggle">▼</div>
+                        </div>
+                    </div>
+                    <div class="section-content">
+                        <div class="word-grid">
+                            ${wordItems}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function toggleSection(header) {
+            const section = header.parentElement;
+            section.classList.toggle('collapsed');
+        }
+
+        function renderWords() {
+            const container = document.getElementById('matrixContainer');
+            const filter = document.querySelector('.filter-btn.active').dataset.filter;
+            const rangeFilter = document.querySelector('.range-btn.active').dataset.range;
+            const searchTerm = document.getElementById('searchBox').value.toLowerCase();
+
+            let filteredWords = words;
+
+            // Apply status filter
+            if (filter !== 'all') {
+                filteredWords = words.filter(word => {
+                    const status = getWordStatus(word.number);
+                    if (filter === 'untested') return !status;
+                    return status && status.status === filter;
+                });
+            }
+
+            // Apply search filter
+            if (searchTerm) {
+                filteredWords = filteredWords.filter(word =>
+                    word.word.toLowerCase().includes(searchTerm) ||
+                    word.definition.toLowerCase().includes(searchTerm)
+                );
+            }
+
+            // Apply range filter
+            if (rangeFilter !== 'all') {
+                const [start, end] = rangeFilter.split('-').map(Number);
+                filteredWords = filteredWords.filter(word =>
+                    word.number >= start && word.number <= end
+                );
+            }
+
+            if (searchTerm || filter !== 'all' || rangeFilter !== 'all') {
+                // Show filtered results in a single grid
+                container.innerHTML = `
+                    <div class="word-grid">
+                        ${filteredWords.map(createWordItem).join('')}
+                    </div>
+                `;
+            } else {
+                // Show collapsible sections
+                let sectionsHTML = '';
+                for (let i = 1; i <= 450; i += 50) {
+                    const end = Math.min(i + 49, 450);
+                    sectionsHTML += createSection(i, end, words);
+                }
+                container.innerHTML = sectionsHTML;
+            }
+
+            updateStats();
+        }
+
+        // User tracking variables
+        let userSessionId = localStorage.getItem('userSessionId') || null;
+
+        // User tracking functions
+        async function initializeSession() {
+            try {
+                // Create AbortController with timeout
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 5000);
+
+                const response = await fetch('/api/track-session', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ sessionId: userSessionId }),
+                    signal: controller.signal
+                });
+
+                clearTimeout(timeoutId);
+
+                if (response.ok) {
+                    const data = await response.json();
+                    userSessionId = data.sessionId;
+                    localStorage.setItem('userSessionId', userSessionId);
+                } else {
+                    console.log('Session tracking unavailable:', response.status);
+                }
+            } catch (error) {
+                if (error.name === 'AbortError') {
+                    console.log('Session tracking timeout');
+                } else {
+                    console.log('Session tracking unavailable:', error);
+                }
+            }
+        }
+
+        async function trackUserAction(action) {
+            if (!userSessionId) return;
+
+            try {
+                // Create AbortController with timeout
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 3000);
+
+                const response = await fetch('/api/track-word', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        sessionId: userSessionId,
+                        action: action
+                    }),
+                    signal: controller.signal
+                });
+
+                clearTimeout(timeoutId);
+
+                if (!response.ok) {
+                    console.log('Action tracking failed:', response.status);
+                }
+            } catch (error) {
+                if (error.name === 'AbortError') {
+                    console.log('Action tracking timeout');
+                } else {
+                    console.log('Action tracking unavailable:', error);
+                }
+            }
+        }
+
+        // Event listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize user session only when user interacts with the app
+            // Do not initialize on page load to prevent unnecessary API calls
+            // Filter buttons
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    renderWords();
+                });
+            });
+
+            // Range filter buttons
+            document.querySelectorAll('.range-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    document.querySelectorAll('.range-btn').forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    renderWords();
+                });
+            });
+
+            // Search box
+            document.getElementById('searchBox').addEventListener('input', renderWords);
+
+
+            // Data management controls
+            document.getElementById('exportBtn').addEventListener('click', exportProgress);
+            document.getElementById('importBtn').addEventListener('click', importProgress);
+            document.getElementById('importFile').addEventListener('change', handleImportFile);
+
+
+            // Initial render
+            renderWords();
+            updateVoiceStatus();
+            updateDataStatus();
+
+            console.log('💾 App loaded - all data persisted across sessions');
+            console.log('API Key stored:', !!openaiApiKey);
+            console.log('Progress entries:', Object.keys(JSON.parse(localStorage.getItem('spellingBeeProgress') || '{}')).length);
+        });
+
+        // Warning when user tries to close browser/tab
+        window.addEventListener('beforeunload', function(e) {
+            e.preventDefault();
+            e.returnValue = 'Remeber to Export Progress for Spelling Bee Space';
+            return 'Remeber to Export Progress for Spelling Bee Space';
+        });
+
+        // Make functions globally available
+        window.speakWord = speakWord;
+        window.setWordStatus = setWordStatus;
+        window.clearWordStatus = clearWordStatus;
+        window.renderWords = renderWords;
+        window.toggleSection = toggleSection;
+        window.setApiKey = setApiKey;
+        window.updateVoiceStatus = updateVoiceStatus;
+        window.exportProgress = exportProgress;
+        window.importProgress = importProgress;
+    </script>
+</body>
+</html>

@@ -1,17 +1,4 @@
 {
-  "functions": {
-    "api/*.ts": {
-      "runtime": "@vercel/node@18"
-    }
-  },
-  "redirects": [
-    {
-      "source": "https://www.spellingbee.space/:path*",
-      "destination": "https://spellingbee.space/:path*",
-      "permanent": true,
-      "statusCode": 301
-    }
-  ],
   "headers": [
     {
       "source": "/api/(.*)",
