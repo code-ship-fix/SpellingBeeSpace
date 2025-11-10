@@ -1105,6 +1105,15 @@
             try {
                 console.log(`🤖 Generating AI audio for: "${cleanText}" with voice: ${voice}`);
 
+                // Initialize session if not already done
+                if (!userSessionId) {
+                    await initializeSession();
+                }
+
+                // Create AbortController with timeout
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 10000);
+
                 const response = await fetch('/api/tts', {
                     method: 'POST',
                     headers: {
@@ -1115,8 +1124,11 @@
                         voice: voice,
                         speed: Math.max(0.25, Math.min(4.0, rate)),
                         sessionId: userSessionId
-                    })
+                    }),
+                    signal: controller.signal
                 });
+
+                clearTimeout(timeoutId);
 
                 if (!response.ok) {
                     const errorData = await response.json().catch(() => ({}));
@@ -1141,7 +1153,14 @@
                 return audioUrl;
             } catch (error) {
                 console.error('AI TTS Error:', error);
-                throw error;
+
+                if (error.name === 'AbortError') {
+                    throw new Error('Speech generation timed out. Please try again.');
+                } else if (error.message.includes('timeout')) {
+                    throw new Error('Request timeout. Please try again.');
+                } else {
+                    throw error;
+                }
             }
         }
 
@@ -1282,8 +1301,13 @@
             }
         }
 
-        function setWordStatus(wordNumber, status) {
+        async function setWordStatus(wordNumber, status) {
             try {
+                // Initialize session if not already done
+                if (!userSessionId) {
+                    await initializeSession();
+                }
+
                 // Track word practice
                 trackUserAction('practiced');
 
@@ -1460,6 +1484,11 @@
         }
 
         async function speakWord(word, rate = 0.75) {
+            // Initialize session if not already done
+            if (!userSessionId) {
+                await initializeSession();
+            }
+
             // Track classic speech usage
             trackUserAction('classic_speech');
 
@@ -1695,21 +1724,34 @@
         // User tracking functions
         async function initializeSession() {
             try {
-                const response = await fetch('/api/track/session', {
+                // Create AbortController with timeout
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 5000);
+
+                const response = await fetch('/api/track-session', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify({ sessionId: userSessionId })
+                    body: JSON.stringify({ sessionId: userSessionId }),
+                    signal: controller.signal
                 });
+
+                clearTimeout(timeoutId);
 
                 if (response.ok) {
                     const data = await response.json();
                     userSessionId = data.sessionId;
                     localStorage.setItem('userSessionId', userSessionId);
+                } else {
+                    console.log('Session tracking unavailable:', response.status);
                 }
             } catch (error) {
-                console.log('Session tracking unavailable:', error);
+                if (error.name === 'AbortError') {
+                    console.log('Session tracking timeout');
+                } else {
+                    console.log('Session tracking unavailable:', error);
+                }
             }
         }
 
@@ -1717,7 +1759,11 @@
             if (!userSessionId) return;
 
             try {
-                await fetch('/api/track/word', {
+                // Create AbortController with timeout
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 3000);
+
+                const response = await fetch('/api/track-word', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -1725,17 +1771,28 @@
                     body: JSON.stringify({
                         sessionId: userSessionId,
                         action: action
-                    })
+                    }),
+                    signal: controller.signal
                 });
+
+                clearTimeout(timeoutId);
+
+                if (!response.ok) {
+                    console.log('Action tracking failed:', response.status);
+                }
             } catch (error) {
-                console.log('Action tracking unavailable:', error);
+                if (error.name === 'AbortError') {
+                    console.log('Action tracking timeout');
+                } else {
+                    console.log('Action tracking unavailable:', error);
+                }
             }
         }
 
         // Event listeners
         document.addEventListener('DOMContentLoaded', function() {
-            // Initialize user session
-            initializeSession();
+            // Initialize user session only when user interacts with the app
+            // Do not initialize on page load to prevent unnecessary API calls
             // Filter buttons
             document.querySelectorAll('.filter-btn').forEach(btn => {
                 btn.addEventListener('click', function() {

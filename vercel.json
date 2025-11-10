@@ -1,0 +1,34 @@
+{
+  "functions": {
+    "api/*.ts": {
+      "runtime": "@vercel/node@18"
+    }
+  },
+  "redirects": [
+    {
+      "source": "https://www.spellingbee.space/:path*",
+      "destination": "https://spellingbee.space/:path*",
+      "permanent": true,
+      "statusCode": 301
+    }
+  ],
+  "headers": [
+    {
+      "source": "/api/(.*)",
+      "headers": [
+        {
+          "key": "Access-Control-Allow-Origin",
+          "value": "*"
+        },
+        {
+          "key": "Access-Control-Allow-Methods",
+          "value": "GET, POST, PUT, DELETE, OPTIONS"
+        },
+        {
+          "key": "Access-Control-Allow-Headers",
+          "value": "Content-Type, Authorization"
+        }
+      ]
+    }
+  ]
+}
