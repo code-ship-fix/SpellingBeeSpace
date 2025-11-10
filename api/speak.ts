@@ -4,14 +4,6 @@ interface RequestBody {
   prompt: string;
 }
 
-declare global {
-  var process: {
-    env: {
-      OPENAI_API_KEY: string;
-    }
-  }
-}
-
 export default async function handler(request: Request) {
   // Set content type for all responses
   const headers = {
@@ -68,7 +60,7 @@ export default async function handler(request: Request) {
     }
 
     // Check for API key
-    const apiKey = process.env.OPENAI_API_KEY;
+    const apiKey = (process.env as any).OPENAI_API_KEY;
     if (!apiKey) {
       return new Response(
         JSON.stringify({ error: 'OpenAI API key not configured' }),
