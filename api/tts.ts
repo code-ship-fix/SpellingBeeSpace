@@ -7,6 +7,14 @@ interface RequestBody {
   sessionId?: string;
 }
 
+declare global {
+  var process: {
+    env: {
+      OPENAI_API_KEY: string;
+    }
+  }
+}
+
 export default async function handler(request: Request) {
   // Set content type for all responses
   const headers = {
