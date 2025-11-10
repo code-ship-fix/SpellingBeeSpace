@@ -1105,9 +1105,9 @@
             try {
                 console.log(`🤖 Generating AI audio for: "${cleanText}" with voice: ${voice}`);
 
-                // Initialize session if not already done
+                // Initialize session in background if not already done
                 if (!userSessionId) {
-                    await initializeSession();
+                    initializeSession();
                 }
 
                 // Create AbortController with timeout
@@ -1303,9 +1303,9 @@
 
         async function setWordStatus(wordNumber, status) {
             try {
-                // Initialize session if not already done
+                // Initialize session in background if not already done
                 if (!userSessionId) {
-                    await initializeSession();
+                    initializeSession();
                 }
 
                 // Track word practice
@@ -1484,9 +1484,9 @@
         }
 
         async function speakWord(word, rate = 0.75) {
-            // Initialize session if not already done
+            // Initialize session in background if not already done
             if (!userSessionId) {
-                await initializeSession();
+                initializeSession();
             }
 
             // Track classic speech usage
@@ -1722,71 +1722,75 @@
         let userSessionId = localStorage.getItem('userSessionId') || null;
 
         // User tracking functions
-        async function initializeSession() {
-            try {
-                // Create AbortController with timeout
-                const controller = new AbortController();
-                const timeoutId = setTimeout(() => controller.abort(), 5000);
+        function initializeSession() {
+            // Background session initialization - don't block UI
+            (async () => {
+                try {
+                    const controller = new AbortController();
+                    const timeoutId = setTimeout(() => controller.abort(), 5000);
 
-                const response = await fetch('/api/track-session', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ sessionId: userSessionId }),
-                    signal: controller.signal
-                });
+                    const response = await fetch('/api/track-session', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ sessionId: userSessionId }),
+                        signal: controller.signal
+                    });
 
-                clearTimeout(timeoutId);
+                    clearTimeout(timeoutId);
 
-                if (response.ok) {
-                    const data = await response.json();
-                    userSessionId = data.sessionId;
-                    localStorage.setItem('userSessionId', userSessionId);
-                } else {
-                    console.log('Session tracking unavailable:', response.status);
+                    if (response.ok) {
+                        const data = await response.json();
+                        userSessionId = data.sessionId;
+                        localStorage.setItem('userSessionId', userSessionId);
+                    } else {
+                        console.log('Session tracking unavailable:', response.status);
+                    }
+                } catch (error) {
+                    if (error.name === 'AbortError') {
+                        console.log('Session tracking timeout');
+                    } else {
+                        console.log('Session tracking unavailable:', error);
+                    }
                 }
-            } catch (error) {
-                if (error.name === 'AbortError') {
-                    console.log('Session tracking timeout');
-                } else {
-                    console.log('Session tracking unavailable:', error);
-                }
-            }
+            })();
         }
 
-        async function trackUserAction(action) {
+        function trackUserAction(action) {
             if (!userSessionId) return;
 
-            try {
-                // Create AbortController with timeout
-                const controller = new AbortController();
-                const timeoutId = setTimeout(() => controller.abort(), 3000);
+            // Fire-and-forget tracking - don't block UI
+            (async () => {
+                try {
+                    const controller = new AbortController();
+                    const timeoutId = setTimeout(() => controller.abort(), 3000);
 
-                const response = await fetch('/api/track-word', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        sessionId: userSessionId,
-                        action: action
-                    }),
-                    signal: controller.signal
-                });
+                    const response = await fetch('/api/track-word', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            sessionId: userSessionId,
+                            action: action
+                        }),
+                        signal: controller.signal
+                    });
 
-                clearTimeout(timeoutId);
+                    clearTimeout(timeoutId);
 
-                if (!response.ok) {
-                    console.log('Action tracking failed:', response.status);
+                    if (!response.ok) {
+                        console.log('Action tracking failed:', response.status);
+                    }
+                } catch (error) {
+                    if (error.name === 'AbortError') {
+                        console.log('Action tracking timeout');
+                    } else {
+                        console.log('Action tracking unavailable:', error);
+                    }
                 }
-            } catch (error) {
-                if (error.name === 'AbortError') {
-                    console.log('Action tracking timeout');
-                } else {
-                    console.log('Action tracking unavailable:', error);
-                }
-            }
+            })();
         }
 
         // Event listeners
